@@ -1,0 +1,221 @@
+---
+swagger: '2.0'
+info:
+  version: '0.0.1'
+  title: Cost, Energy and Resource Consumption Modeling Engines API specification
+  description: RESTful API specification for the ElasTest Cost Modeling service
+  termsOfService: http://www.piyush-harsh.info/tos.txt
+  contact:
+    name: Manu Perez
+    email: perz@zhaw.ch
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+host: elastest.cost.modeling
+basePath: /api
+
+schemes:
+ - "http"
+ - "https"
+
+consumes:
+ - application/json
+
+produces:
+ - application/text
+ - application/json
+
+paths:
+  /:
+    get:
+      description: list of supported api calls
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+  /costmodel:
+    post:
+      description: Creates a new Cost Model.
+      produces:
+        - application/json
+      parameters:
+        - 
+          in: body
+          name: body
+          description: Details about the Cost Model to be created.
+          required: true
+          schema:
+            $ref: "#/definitions/CostModelDefinition"
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: "#/definitions/CreateCostModelOutput"
+        default:
+          description: Unexpexted error
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+  /costmodel/{id}:
+    get:
+      description: Get details about a given Cost Model.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/CostModelDetail"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+    delete:
+      description: Deletes a given Cost Model.
+      produces:
+        - application/json
+      parameters:
+        - 
+          in: body
+          name: body
+          description: Cost model to be deleted
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/DeleteCostModelOutput"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+  /estimate/{testId}/costmodel/{costModelId}:
+    get:
+      description: Get a cost estimate of a Test Job running on a given Cost Model.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/EstimateCostModelOutput"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+  /status/{SuTId}:
+    get:
+      description: Get the current status of a running System under Test.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+              $ref: "#/definitions/Status"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+  /cost/{SuTId}:
+    get:
+      description: Get the final cost of a finished Test on a System under Test.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Cost"
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: "#/definitions/UnexpectedError"
+
+definitions:
+  UnexpectedError:
+    type: object
+    properties:
+      Error:
+        type: string
+  Cost:
+    type: object
+    properties:
+      SuT:
+        type: string
+      startTime:
+        type: int64
+      endTime:
+        type: int64
+      cost:
+        type: double
+      unit:
+        type: string
+  CostModelDetail:
+    type: object
+    properties:
+      ModelId:
+        type: string
+  CreateCostModel:
+    type: object
+    properties:
+      ModelId:
+        type: string
+  EstimateCostModelOutput:
+    type: object
+    properties:
+      testId:
+        type: string
+      costModelId:
+        type: string
+      estimatedCost:
+        type: double
+      unit:
+        type: string
+  CreateCostModelOutput:
+    type: object
+    properties:
+      ModelId:
+        type: string
+  DeleteCostModelOutput:
+    type: object
+    properties:
+      costModelId:
+        type: string
+      status:
+        type: string
+  Status:
+    type: object
+    properties:
+      SuT:
+        type: string
+      startTime:
+        type: int64
+      Cost:
+        type: double
+      Unit:
+        type: string
+      Status:
+        type: string
+  CostModelDefinition:
+    type: object
+    properties:
+      name:
+        type: string
+      definiton: 
+        - expressionName: string
+          expression: string
+          expressionDefinition:
+            fieldX: string
+            fieldY: string
+        - expressionName: PAYG
+          expression: (usedSeconds * pricePerSecond)
+          expressionDefinition:
+            usedSeconds: int64
+            pricePerSecond: double
