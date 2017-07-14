@@ -35,19 +35,19 @@ public class APIControllerTest extends TestCase {
         return new TestSuite(APIControllerTest.class);
     }
 
-    @Test
-    public void testGetIndex() {
-        apiController = new APIController();
+//    @Test
+//    public void testGetIndex() {
+//        apiController = new APIController();
+//
+//        assertEquals(apiController.getIndex(null), "redirection");
+//    }
 
-        assertEquals(apiController.getIndex(null), "redirection");
-    }
-
-    @Test
-    public void testAddCostModel() {
-        apiController = new APIController();
-
-        assertEquals(apiController.addCostModel("", 0.0, 0.0, 0.0, null), "redirection");
-    }
+//    @Test
+//    public void testAddCostModel() {
+//        apiController = new APIController();
+//
+//        assertEquals(apiController.addCostModel("", 0.0, 0.0, 0.0, null), "redirection");
+//    }
 
     @Test
     public void testGetCostModel() {
@@ -77,19 +77,19 @@ public class APIControllerTest extends TestCase {
         assertEquals(apiController.estimate("", null, null), "redirection");
     }
 
-    @Test
-    public void testGetStatus() {
-        apiController = new APIController();
-
-        assertEquals(apiController.getStatus("SuT0", null), "redirection", null);
-    }
-
-    @Test
-    public void testgetCost() {
-        apiController = new APIController();
-
-        assertEquals(apiController.getCost("SuT0", null), "redirection", null);
-    }
+//    @Test
+//    public void testGetStatus() {
+//        apiController = new APIController();
+//
+//        assertEquals(apiController.getStatus("SuT0", null), "redirection", null);
+//    }
+//
+//    @Test
+//    public void testgetCost() {
+//        apiController = new APIController();
+//
+//        assertEquals(apiController.getCost("SuT0", null), "redirection", null);
+//    }
 
 
 }
