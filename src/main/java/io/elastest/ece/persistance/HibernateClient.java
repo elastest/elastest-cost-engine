@@ -82,7 +82,6 @@ public class HibernateClient {
      * @param obj to be stored
      * @return updated object
      */
-    @Transactional
     public Object persistObject(Object obj) {
 
         // first get session
