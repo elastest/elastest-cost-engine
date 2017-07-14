@@ -1,6 +1,6 @@
 package elastest.io.ece;
 
-import io.elastest.ece.APIController;
+import io.elastest.ece.application.APIController;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.junit.Test;
@@ -39,49 +39,56 @@ public class APIControllerTest extends TestCase {
     public void testGetIndex() {
         apiController = new APIController();
 
-        assertEquals(apiController.getIndex(), "redirection");
+        assertEquals(apiController.getIndex(null), "redirection");
     }
 
     @Test
     public void testAddCostModel() {
         apiController = new APIController();
 
-        assertEquals(apiController.addCostModel(), "redirection");
+        assertEquals(apiController.addCostModel("", 0.0, 0.0, 0.0, null), "redirection");
     }
 
     @Test
     public void testGetCostModel() {
         apiController = new APIController();
 
-        assertEquals(apiController.getCostModel("model0"), "redirection");
+        assertEquals(apiController.getCostModel("model0", null), "redirection");
     }
 
     @Test
     public void testDeleteCostModel() {
         apiController = new APIController();
 
-        assertEquals(apiController.deleteCostModel("model0"), "redirection");
+        assertEquals(apiController.deleteCostModel("model0", null), "redirection");
     }
 
     @Test
     public void testEstimate() {
         apiController = new APIController();
 
-        assertEquals(apiController.estimate("test0", "model0"), "redirection");
+        assertEquals(apiController.estimate("test0", "model0", null), "redirection");
+    }
+
+    @Test
+    public void testPostEstimate() {
+        apiController = new APIController();
+
+        assertEquals(apiController.estimate("", null, null), "redirection");
     }
 
     @Test
     public void testGetStatus() {
         apiController = new APIController();
 
-        assertEquals(apiController.getStatus("SuT0"), "redirection");
+        assertEquals(apiController.getStatus("SuT0", null), "redirection", null);
     }
 
     @Test
     public void testgetCost() {
         apiController = new APIController();
 
-        assertEquals(apiController.getCost("SuT0"), "redirection");
+        assertEquals(apiController.getCost("SuT0", null), "redirection", null);
     }
 
 

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/js/index.js"></script>
+    <title>ElasTest | ECE</title>
+
+</head>
+<body>
+<form method="post" action="/estimate">
+    <table>
+        <thead>
+        <tr>
+            <th>T-Job</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+        <tr th:each="test: ${tests}">
+            <td th:text="${test.name}">testId</td>
+            <td><input type="radio" name="testName" th:value="${test.name}"></td>
+        </tr>
+        </td>
+        <td>
+            <tr th:text="${estimate}"></tr>
+        </td>
+        </tr>
+        </tbody>
+    </table>
+    <br><br>
+    <table>
+        <thead>
+        <tr>
+            <th>Cost Model</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+        <tr th:each="costModel: ${costModels}">
+            <td th:text="${costModel.name}">planId</td>
+            <td><input type="radio" name="costModelName" th:value="${costModel.name}"></td>
+        </tr>
+        </td>
+        <td>
+            <button id="estimateButton">Estimate</button>
+        </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<br><br>
+<form method="post" action="/costmodel">
+    <table>
+        <tr>
+            <th>Create Cost Model</th>
+        </tr>
+        <tr>
+            <td>Cost Model Name<input type="text" name="name"></td>
+        </tr>
+        <tr>
+            <td>Cost per CPU core<input type="number" name="cpus"></td>
+        </tr>
+        <tr>
+            <td>Cost per Memory GB<input type="number" name="memory"></td>
+        </tr>
+        <tr>
+            <td>Cost per Disk GB<input type="number" name="disk"></td>
+        </tr>
+        <tr>
+            <td><button id="createCostModel">Add Cost Model</button></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
+
