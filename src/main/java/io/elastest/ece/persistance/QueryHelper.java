@@ -1,8 +1,4 @@
-package io.elastest.ece.model;
-
-
-
-import javax.persistence.*;
+package io.elastest.ece.persistance;
 
 /**
  * Copyright (c) 2017. Zuercher Hochschule fuer Angewandte Wissenschaften
@@ -20,29 +16,17 @@ import javax.persistence.*;
  * License for the specific language governing permissions and limitations
  * under the License.
  * <p>
- * Created by Manu Perez on 14/07/17.
+ * Created by Manu Perez on 09/08/17.
  */
+public class QueryHelper {
 
-@Entity
-public class CostItem {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
-    private Double cost;
-
-    public CostItem(Double cost) {
-        this.cost = Double.valueOf(cost);
+    /**
+     * Create List query
+     * @param clazz we are listing
+     * @return string
+     */
+    public static String createListQuery(Class clazz) {
+        return String.format("FROM %s", clazz.getName());
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public double getCost() {
-        return cost;
-    }
-
-    public void setCost(double cost) {
-        this.cost = cost;
-    }
 }

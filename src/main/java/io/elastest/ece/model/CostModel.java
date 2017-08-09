@@ -1,7 +1,6 @@
 package io.elastest.ece.model;
 
 import javax.persistence.*;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,28 +25,43 @@ import java.util.Map;
 @Entity
 public class CostModel {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
     private String name;
 
-    @Column(columnDefinition = "TEXT")
     private String type;
 
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @MapKey(name = "cost")
-//    private Map<String,CostItem> cost;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Map<String, Double> fix_cost;
 
-    private Map<String,Double> cost;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Map<String, Double> var_rate;
 
-    @Column(columnDefinition = "TEXT")
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Map<String, String> components;
+
     private String description;
 
-    public CostModel(String name, String type, Map cost) {
+    protected CostModel(){}
+
+    public CostModel(String name, String type, Map fix_cost) {
         this.name = name;
         this.type = type;
-        this.cost = cost;
+        this.fix_cost = fix_cost;
+    }
+
+    public CostModel(String name, String type, Map<String, Double> fix_cost, Map<String, Double> var_rate, Map<String, String> components, String description) {
+        this.name = name;
+        this.type = type;
+        this.fix_cost = fix_cost;
+        this.var_rate = var_rate;
+        this.components = components;
+        this.description = description;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getDescription() {
@@ -74,11 +88,27 @@ public class CostModel {
         this.type = type;
     }
 
-    public Map getCost() {
-        return cost;
+    public Map<String, Double> getFix_cost() {
+        return fix_cost;
     }
 
-    public void setCost(HashMap cost) {
-        this.cost = cost;
+    public void setFix_cost(Map<String, Double> fix_cost) {
+        this.fix_cost = fix_cost;
+    }
+
+    public Map<String, Double> getVar_rate() {
+        return var_rate;
+    }
+
+    public void setVar_rate(Map<String, Double> var_rate) {
+        this.var_rate = var_rate;
+    }
+
+    public Map<String, String> getComponents() {
+        return components;
+    }
+
+    public void setComponents(Map<String, String> components) {
+        this.components = components;
     }
 }

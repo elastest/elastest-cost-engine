@@ -35,10 +35,15 @@ public class TJob {
 //    @OneToMany(cascade = CascadeType.ALL)
 //    @MapKey(name = "quantity")
 //    private Map<String, TJobItem> metadata;
-    private Map<String, Double> metadata;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Map<String, String> metadata;
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    public TJob() {
+    }
 
     public TJob(String name, Map metadata) {
         this.name = name;
@@ -65,11 +70,11 @@ public class TJob {
         this.name = name;
     }
 
-    public Map getMetadata() {
+    public Map<String, String> getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(Map metadata) {
+    public void setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
     }
 }

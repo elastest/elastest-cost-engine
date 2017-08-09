@@ -1,9 +1,9 @@
 package io.elastest.ece.application;
 
-import io.elastest.ece.model.CostItem;
 import io.elastest.ece.model.CostModel;
 import io.elastest.ece.model.TJob;
 import io.elastest.ece.persistance.HibernateClient;
+import io.elastest.ece.persistance.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright (c) 2017. Zuercher Hochschule fuer Angewandte Wissenschaften
@@ -39,35 +43,40 @@ import java.util.HashMap;
 public class APIController {
 
     private static final Logger logger = LoggerFactory.getLogger(APIController.class.getName());
-    private HashMap<String, CostModel> costModelStorage = new HashMap<>();
-    private HashMap<String, TJob> tJobStorage = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+//        testCostModelValues();
+//        testTestValues();
+    }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String getIndex(Model model) {
         logger.info("Creating test values.");
-        ArrayList tests = testTestValues();
-        ArrayList costs = testCostModelValues();
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        List<TJob> tJobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
 
         logger.info("Adding attributes to the model.");
-        model.addAttribute("tests", tests);
-        model.addAttribute("costModels", costs);
+        model.addAttribute("tests", tJobs);
+        model.addAttribute("costModels", costModels);
         logger.info("Redirecting to the ECE's Index Page.");
         return "index";
     }
 
     @RequestMapping(value = "/costmodel", method = RequestMethod.POST)
-    public String addCostModel(@RequestParam String name, @RequestParam double cpus, @RequestParam double memory, @RequestParam double disk, Model model) {
+    public String addCostModel(@RequestParam String name, @RequestParam String description, @RequestParam String fixName, @RequestParam Double fixValue, @RequestParam double cpus, @RequestParam double memory, @RequestParam double disk, Model model) {
         logger.info("Creating Cost Model.");
-        HashMap<String, Double> costs = new HashMap<>();
-        costs.put("cpus", cpus);
-        costs.put("memory", memory);
-        costs.put("disk", disk);
-//        HashMap<String, CostItem> costs = new HashMap<>();
-//        costs.put("cpus", new CostItem(cpus));
-//        costs.put("memory", new CostItem(memory));
-//        costs.put("disk", new CostItem(disk));
-        CostModel costModel = new CostModel(name, "ONDEMAND", costs);
-        costModelStorage.put(name, costModel);
+        HashMap<String, Double> varCosts = new HashMap<>();
+        varCosts.put("cpus", cpus);
+        varCosts.put("memory", memory);
+        varCosts.put("disk", disk);
+
+        HashMap<String, Double> fixCosts = new HashMap<>();
+        fixCosts.put(fixName, fixValue);
+
+
+        CostModel costModel = new CostModel(name, "ONDEMAND", fixCosts, varCosts, null, description);
         logger.info("Persisting the created Cost Model into the DB");
         HibernateClient hibernateClient = HibernateClient.getInstance();
         hibernateClient.persistObject(costModel);
@@ -88,26 +97,38 @@ public class APIController {
     }
 
     @RequestMapping(value = "/estimate", method = RequestMethod.POST)
-    public String estimatePost(@RequestParam String testName, @RequestParam String costModelName, Model model) {
-        CostModel costModel = costModelStorage.get(costModelName);
-        TJob tJob = tJobStorage.get(testName);
+    public String estimatePost(@RequestParam String testId, @RequestParam String costModelId, Model model) {
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        CostModel costModel = (CostModel) hibernateClient.getObject(CostModel.class, Long.valueOf(costModelId));
+        TJob tJob = (TJob) hibernateClient.getObject(TJob.class, Long.valueOf(testId));
         double totalCost = 0;
-        if (costModel.getType().equalsIgnoreCase("PAYG")) {
-            for (Object key : costModel.getCost().keySet()) {
-                if (tJob.getMetadata().containsKey(String.valueOf(key))) {
+        String costModelType = costModel.getType();
+        if(costModelType.equalsIgnoreCase("ONDEMAND")){
+            Map<String, Double> fixCost = costModel.getFix_cost();
+            Map<String, Double> varRate = costModel.getVar_rate();
+            Map<String, String> components = costModel.getComponents();
+            Map<String, String> metadata = tJob.getMetadata();
 
+            logger.info("Adding all fix costs from the cost model.");
+            for(Object key : fixCost.keySet()){
+                totalCost += fixCost.get(key);
+            }
+
+            logger.info("Adding all the accounted variable costs in the model");
+            for(Object key : varRate.keySet()){
+                if(tJob.getMetadata().containsKey(key)){
+                    totalCost += (Double.parseDouble(metadata.get(key)) * (varRate.get(key)));
                 }
             }
-        } else if (costModel.getType().equalsIgnoreCase("ONDEMAND")) {
-            for (Object key : costModel.getCost().keySet()) {
-                if (tJob.getMetadata().containsKey(String.valueOf(key))) {
-                    totalCost += (Double.parseDouble(String.valueOf(tJob.getMetadata().get(String.valueOf(key)))) * Double.parseDouble(String.valueOf(costModel.getCost().get(key))));
-                }
-            }
+
+            //TODO:add component costs.
+            logger.info("Adding all the component costs.");
+        }else if(costModelType.equalsIgnoreCase("PAYG")){
+            //TODO: implement
         }
 
         model.addAttribute("estimate", totalCost);
-        logger.info("Returning an estimate for the test jobs: " + testName + " and the Cost Model: " + costModelName);
+        logger.info("Returning an estimate for the test jobs: " + testId + " and the Cost Model: " + costModelId);
         return "estimate";
     }
 
@@ -132,71 +153,57 @@ public class APIController {
     private ArrayList testCostModelValues() {
         logger.info("Creating Demo Cost Model Values.");
         ArrayList<CostModel> result = new ArrayList();
-        HashMap costs = new HashMap();
-//        costs.put("cpus", new CostItem(50.0));
-//        costs.put("memory", new CostItem(10.0));
-//        costs.put("disk", new CostItem(1.0));
-//
-//        HashMap costs1 = new HashMap();
-//        costs1.put("cpus", new CostItem(1.0));
-//        costs1.put("memory", new CostItem(1.0));
-//        costs1.put("disk", new CostItem(1.0));
-        costs.put("cpus", 50.0);
-        costs.put("memory", 10.0);
-        costs.put("disk", 1.0);
+        HashMap varCosts = new HashMap();
+        varCosts.put("cpus", 50.0);
+        varCosts.put("memory", 10.0);
+        varCosts.put("disk", 1.0);
+        HashMap fixCost = new HashMap();
+        fixCost.put("deployment", 5.0);
 
-        HashMap costs1 = new HashMap();
-        costs1.put("cpus", 1.0);
-        costs1.put("memory", 1.0);
-        costs1.put("disk", 1.0) ;
+        CostModel costModel = new CostModel("On Demand 5 + Charges", "ONDEMAND", fixCost, varCosts, null, "On Demand 5 per deployment, 50 per core, 10 per GB ram and 1 per GB disk");
+        result.add(costModel);
 
-        CostModel costModel0 = new CostModel("On Demand, 50 per core, 10 per GB ram and 1 per GB disk", "ONDEMAND", costs);
-        CostModel costModel1 = new CostModel("On Demand, 1 Per Each", "ONDEMAND", costs1);
-        CostModel costModel2 = new CostModel("PAYG", "PAYG", costs);
-        result.add(costModel0);
+        HashMap varCosts1 = new HashMap();
+        varCosts1.put("cpus", 1.0);
+        varCosts1.put("memory", 1.0);
+        varCosts1.put("disk", 1.0);
+        HashMap fixCost1 = new HashMap();
+        fixCost1.put("deployment", 10.0);
+
+        CostModel costModel1 = new CostModel("On demand 10 + Charges", "ONDEMAND", fixCost1, varCosts1, null, "On Demand 10 per deployment, 1 per core, 1 per GB ram and 1 per GB disk");
         result.add(costModel1);
-        result.add(costModel2);
-        costModelStorage.put(result.get(0).getName(), result.get(0));
-        costModelStorage.put(result.get(1).getName(), result.get(1));
-        costModelStorage.put(result.get(2).getName(), result.get(2));
 
-//        logger.info("Persisting demo values");
-//        HibernateClient hibernateClient = HibernateClient.getInstance();
-//        hibernateClient.persistObject(costModel0);
-//        hibernateClient.persistObject(costModel1);
-//        hibernateClient.persistObject(costModel2);
-
+        logger.info("Persisting demo values");
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        hibernateClient.persistObject(costModel);
+        hibernateClient.persistObject(costModel1);
         return result;
     }
 
     private ArrayList testTestValues() {
+        logger.info("Creating Demo T-Job Values.");
         ArrayList<TJob> result = new ArrayList();
-        HashMap<String, Double> test0Map = new HashMap<>();
-        test0Map.put("cpus", 8.0);
-        test0Map.put("memory", 20.0);
-        test0Map.put("disk", 500.0);
-        HashMap<String, Double> test1Map = new HashMap<>();
-        test1Map.put("cpus", 4.0);
-        test1Map.put("memory", 10.0);
-        test1Map.put("disk", 250.0);
-        HashMap<String, Double> test2Map = new HashMap<>();
-        test2Map.put("cpus", 1.0);
-        test2Map.put("memory", 1.0);
-        test2Map.put("disk", 1.0);
+        HashMap<String, String> test0Map = new HashMap<>();
+        test0Map.put("cpus", "8.0");
+        test0Map.put("memory", "20.0");
+        test0Map.put("disk", "500.0");
 
-        TJob test0 = new TJob("test0 8 cores, 20gb ram, 500gb disk ", test0Map);
-        TJob test1 = new TJob("test1 4 cores, 10gb ram, 250gb disk", test1Map);
-        TJob test2 = new TJob("test2 1 core, 1gb ram, 1gb disk", test2Map);
-        test0.setDescription("Test using a Big VM");
-        test1.setDescription("Test using a Medium VM");
-        test2.setDescription("Test using 1 of each unit");
+        HashMap<String, String> test1Map = new HashMap<>();
+        test1Map.put("cpus", "1.0");
+        test1Map.put("memory", "1.0");
+        test1Map.put("disk", "1.0");
 
-        result.add(test0);
-        result.add(test1);
-        result.add(test2);
-        tJobStorage.put(result.get(0).getName(), result.get(0));
-        tJobStorage.put(result.get(1).getName(), result.get(1));
-        tJobStorage.put(result.get(2).getName(), result.get(2));
+        TJob tJob = new TJob("test0 8 cores, 20gb ram, 500gb disk ", test0Map);
+        TJob tJob1 = new TJob("test1 1 core, 1gb ram, 1gb disk ", test1Map);
+        tJob.setDescription("Test using a Big VM");
+
+        result.add(tJob);
+        result.add(tJob1);
+
+        logger.info("Persisting demo values");
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        hibernateClient.persistObject(tJob);
+        hibernateClient.persistObject(tJob1);
         return result;
     }
 }

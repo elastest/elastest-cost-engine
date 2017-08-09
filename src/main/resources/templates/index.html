@@ -23,7 +23,9 @@
             <td>
         <tr th:each="test: ${tests}">
             <td th:text="${test.name}">testId</td>
-            <td><input type="radio" name="testName" th:value="${test.name}"></td>
+            <td>
+                <input type="radio" name="testId" th:value="${test.id}">
+            </td>
         </tr>
         </td>
         <td>
@@ -43,8 +45,10 @@
         <tr>
             <td>
         <tr th:each="costModel: ${costModels}">
-            <td th:text="${costModel.name}">planId</td>
-            <td><input type="radio" name="costModelName" th:value="${costModel.name}"></td>
+            <td th:text="${costModel.description}">planId</td>
+            <td>
+                <input type="radio" name="costModelId" th:value="${costModel.id}">
+            </td>
         </tr>
         </td>
         <td>
@@ -57,24 +61,47 @@
 <br><br>
 <form method="post" action="/costmodel">
     <table>
+        <tbody>
         <tr>
             <th>Create Cost Model</th>
         </tr>
         <tr>
-            <td>Cost Model Name<input type="text" name="name"></td>
+            <td>Cost Model Name</td>
+            <td><input type="text" name="name"></td>
         </tr>
         <tr>
-            <td>Cost per CPU core<input type="number" name="cpus"></td>
+            <td>Cost Model Description</td>
+            <td><input type="text" name="description"></td>
         </tr>
         <tr>
-            <td>Cost per Memory GB<input type="number" name="memory"></td>
+            <th>Fix Costs</th>
         </tr>
         <tr>
-            <td>Cost per Disk GB<input type="number" name="disk"></td>
+            <td><input type="text" name="fixName"></td>
+            <td><input type="number" name="fixValue"></td>
+        </tr>
+
+        <tr>
+            <th>Variable Costs</th>
         </tr>
         <tr>
-            <td><button id="createCostModel">Add Cost Model</button></td>
+            <td>Cost per CPU core</td>
+            <td><input type="number" name="cpus"></td>
         </tr>
+        <tr>
+            <td>Cost per Memory GB</td>
+            <td><input type="number" name="memory"></td>
+        </tr>
+        <tr>
+            <td>Cost per Disk GB</td>
+            <td><input type="number" name="disk"></td>
+        </tr>
+        <tr>
+            <td>
+                <button id="createCostModel">Add Cost Model</button>
+            </td>
+        </tr>
+        </tbody>
     </table>
 </form>
 </body>

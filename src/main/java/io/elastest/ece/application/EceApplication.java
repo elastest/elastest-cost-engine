@@ -18,17 +18,17 @@ public class EceApplication {
 		outputProgressBar("Loading ElasTest Cost Engine");
 
 		// check params and potentially stop execution
-//		checkParameters(args);
-//
-//		// check help parameter and potentially output it
-//		String param = args[0];
-//		checkHelp(param);
-//
-//		// check configuration file and make sure it's correct
-//		checkConfigurationFile(param);
-//
-//		// check and configure hibernate
-//		checkAndConfigureHibernate();
+		checkParameters(args);
+
+		// check help parameter and potentially output it
+		String param = args[0];
+		checkHelp(param);
+
+		// check configuration file and make sure it's correct
+		checkConfigurationFile(param);
+
+		// check and configure hibernate
+		checkAndConfigureHibernate();
 
 		SpringApplication.run(EceApplication.class, args);
 	}
