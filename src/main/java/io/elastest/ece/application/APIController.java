@@ -1,5 +1,7 @@
 package io.elastest.ece.application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.elastest.ece.model.CostModel;
 import io.elastest.ece.model.TJob;
 import io.elastest.ece.persistance.HibernateClient;
@@ -84,16 +86,24 @@ public class APIController {
         return "costModelCreated";
     }
 
-    @RequestMapping(value = "/costmodel/{id}", method = RequestMethod.GET)
-    public String getCostModel(@PathVariable String id, Model model) {
-        logger.info("Returning information about the cost model: " + id);
-        return "redirection";
+    @RequestMapping(value = "/costmodel", method = RequestMethod.GET)
+    public String getCostModel(@RequestParam String costModelId, Model model) {
+        logger.info("Returning information about the cost model: " + costModelId);
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        CostModel costModel = (CostModel) hibernateClient.getObject(CostModel.class, Long.valueOf(costModelId));
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        model.addAttribute("costModel", gson.toJson(costModel));
+        return "costModelInfo";
     }
 
-    @RequestMapping(value = "/costmodel/{id}", method = RequestMethod.DELETE)
-    public String deleteCostModel(@PathVariable String id, Model model) {
-        logger.info("Deletes the Cost Model: " + id);
-        return "redirection";
+    @RequestMapping(value = "/deleteCostModel", method = RequestMethod.POST)
+    public String deleteCostModel(@RequestParam String costModelId) {
+        logger.info("Deleting the Cost Model: " + costModelId);
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        CostModel costModel = (CostModel) hibernateClient.getObject(CostModel.class, Long.valueOf(costModelId));
+        hibernateClient.deleteObject(costModel);
+        logger.info("Deleted.");
+        return "costModelDeleted";
     }
 
     @RequestMapping(value = "/estimate", method = RequestMethod.POST)

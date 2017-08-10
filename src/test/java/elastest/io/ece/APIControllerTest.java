@@ -60,7 +60,7 @@ public class APIControllerTest extends TestCase {
     public void testDeleteCostModel() {
         apiController = new APIController();
 
-        assertEquals(apiController.deleteCostModel("model0", null), "redirection");
+        assertEquals(apiController.deleteCostModel("model0"), "redirection");
     }
 
     @Test
