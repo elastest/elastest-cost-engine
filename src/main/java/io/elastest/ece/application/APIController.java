@@ -142,24 +142,6 @@ public class APIController {
         return "estimate";
     }
 
-    @RequestMapping(value = "/estimate/{testId}/costmodel/{costModelId}", method = RequestMethod.GET)
-    public String estimate(@PathVariable String testId, @PathVariable String costModelId, Model model) {
-        logger.info("Returning an estimate of the test job: " + testId + " and the Cost Model: " + costModelId);
-        return "redirection";
-    }
-
-    @RequestMapping(value = "/status/{SuTId}", method = RequestMethod.GET)
-    public String getStatus(@PathVariable String SuTId, Model model) {
-        logger.info("Returning the status of the SuT: " + SuTId);
-        return "redirection";
-    }
-
-    @RequestMapping(value = "/cost/{SuTId}", method = RequestMethod.GET)
-    public String getCost(@PathVariable String SuTId, Model model) {
-        logger.info("Returning the cost of running the SuT: " + SuTId);
-        return "redirection";
-    }
-
     private ArrayList testCostModelValues() {
         logger.info("Creating Demo Cost Model Values.");
         ArrayList<CostModel> result = new ArrayList();
