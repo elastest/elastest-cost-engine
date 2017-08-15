@@ -48,8 +48,8 @@ public class APIController {
 
     @PostConstruct
     public void init() {
-//        testCostModelValues();
-//        testTestValues();
+        testCostModelValues();
+        testTestValues();
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
