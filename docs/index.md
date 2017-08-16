@@ -31,7 +31,7 @@ When the ECE is started correctly, a basic UI will be exposed at http://localhos
 The 0.0.2 version of ECE initializes the databases and includes two different Cost Models as initial values. The T-Jobs are mocked up until the DSL is correctly defined. 
 
 The ECE UI offers the functionality to estimate the price of running a specified T-Job running under a Cost Model. 
-![ElasTest Cost Engine Demo Interface v0.0.2](imgs/CostEngine002Demo.png =480x640)
+![ElasTest Cost Engine Demo Interface v0.0.2](imgs/CostEngine002Demo.png)
 
 The ECE UI also ofers a simple way to manage all the Cost Models, creating, deleting and requesting for the json structure.
 
