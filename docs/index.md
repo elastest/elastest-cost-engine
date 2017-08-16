@@ -31,7 +31,7 @@ When the ECE is started correctly, a basic UI will be exposed at http://localhos
 The 0.0.2 version of ECE initializes the databases and includes two different Cost Models as initial values. The T-Jobs are mocked up until the DSL is correctly defined. 
 
 The ECE UI offers the functionality to estimate the price of running a specified T-Job running under a Cost Model. 
-![ElasTest Cost Engine Demo Interface v0.0.2](imgs/CostEngine002Demo.png)
+![ElasTest Cost Engine Demo Interface v0.0.2](imgs/CostEngine002Demo.png =480x640)
 
 The ECE UI also ofers a simple way to manage all the Cost Models, creating, deleting and requesting for the json structure.
 
@@ -52,9 +52,12 @@ ECE will be in contact with the following ElasTest services:
    - [The TORM](https://github.com/elastest/elastest-torm) will provide the T-Job details.
    - [The EMS](https://github.com/elastest/elastest-monitoring-service) will provide information about the running T-Jobs.
 
+
 ![ElasTest Cost Engine final architecture](imgs/ECEArch.png)
 
 For now, the 0.0.2 version is using Mock up values to simmulate the interaction with the rest of the ElasTest Components.
+
+
 ![ElasTest Cost Engine Mock up architecture](imgs/MockECE.png)
 
 The Cost Models are defined in a generic way so can be adapted to several cases from VM orchestrations, Service 
