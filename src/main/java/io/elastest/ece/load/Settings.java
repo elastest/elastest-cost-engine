@@ -18,6 +18,7 @@ package io.elastest.ece.load;
 
 import io.elastest.ece.load.model.HibernateCredentials;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -62,12 +63,32 @@ public class Settings {
      */
     private HibernateCredentials loadHibernateConfiguration() {
         HibernateCredentials hibernateCredentials = new HibernateCredentials();
+        Map<String, String> env = System.getenv();
 
-        hibernateCredentials.setHibernateURL(properties.getProperty("HibernateURL"));
-        hibernateCredentials.setHibernateUsername(properties.getProperty("HibernateUsername"));
-        hibernateCredentials.setHibernatePassword(properties.getProperty("HibernatePassword"));
-        hibernateCredentials.setHibernateDriver(properties.getProperty("HibernateDriver"));
-        hibernateCredentials.setHibernateDialect(properties.getProperty("HibernateDialect"));
+        if (env.containsKey("HIBERNATEURL"))
+            hibernateCredentials.setHibernateURL(env.get("HIBERNATEURL"));
+        else
+            hibernateCredentials.setHibernateURL(properties.getProperty("HibernateURL"));
+
+        if (env.containsKey("HIBERNATEUSERNAME"))
+            hibernateCredentials.setHibernateUsername(env.get("HIBERNATEUSERNAME"));
+        else
+            hibernateCredentials.setHibernateUsername(properties.getProperty("HibernateUsername"));
+
+        if (env.containsKey("HIBERNATEPASSWORD"))
+            hibernateCredentials.setHibernatePassword(env.get("HIBERNATEPASSWORD"));
+        else
+            hibernateCredentials.setHibernatePassword(properties.getProperty("HibernatePassword"));
+
+        if (env.containsKey("HIBERNATEDRIVER"))
+            hibernateCredentials.setHibernateDriver(env.get("HIBERNATEDRIVER"));
+        else
+            hibernateCredentials.setHibernateDriver(properties.getProperty("HibernateDriver"));
+
+        if (env.containsKey("HIBERNATEDIALECT"))
+            hibernateCredentials.setHibernateDialect(env.get("HIBERNATEDIALECT"));
+        else
+            hibernateCredentials.setHibernateDialect(properties.getProperty("HibernateDialect"));
 
         return hibernateCredentials;
     }

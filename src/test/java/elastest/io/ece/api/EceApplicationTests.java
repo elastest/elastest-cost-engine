@@ -1,4 +1,4 @@
-package elastest.io.ece;
+package elastest.io.ece.api;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

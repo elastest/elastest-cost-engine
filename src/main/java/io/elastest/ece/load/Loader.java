@@ -41,7 +41,9 @@ public class Loader {
      */
     private Loader(String path) throws Exception {
         // only if object is created by createInstance (which gives it context)
-        if (!path.isEmpty()) {
+        if (path == null) {
+            settings = new Settings(new Properties());
+        } else if (!path.isEmpty()) {
             // start with loading config file
             Properties properties = loadAndParseConfigurationFile(path);
 
@@ -54,7 +56,16 @@ public class Loader {
     }
 
     /**
+     * Public empty initializer
+     */
+    public static void createInstance() throws Exception {
+        if (singleton == null)
+            singleton = new Loader(null);
+    }
+
+    /**
      * When creating instance, we need it to have context
+     *
      * @param path for the configuration file
      */
     public static void createInstance(String path) throws Exception {
@@ -65,6 +76,7 @@ public class Loader {
 
     /**
      * Access settings from Loader class
+     *
      * @return settings object or null
      */
     public static Settings getSettings() {
@@ -77,6 +89,7 @@ public class Loader {
 
     /**
      * Load and parse configuration file
+     *
      * @return null or property object
      */
     private Properties loadAndParseConfigurationFile(String path) {
