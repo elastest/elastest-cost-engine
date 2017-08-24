@@ -77,4 +77,16 @@ public class TJob {
     public void setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof TJob)) {
+            return false;
+        }
+        TJob tjob = (TJob) o;
+        return (tjob.getName().equals(((TJob) o).getName())
+                && tjob.getMetadata().equals(((TJob) o).getMetadata()));
+//                && tjob.getDescription().equals(((TJob) o).getDescription()));
+    }
 }

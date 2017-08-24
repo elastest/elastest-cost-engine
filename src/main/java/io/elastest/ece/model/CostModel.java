@@ -115,19 +115,15 @@ public class CostModel {
 
     @Override
     public boolean equals(Object o) {
-
         if (o == this) return true;
         if (!(o instanceof CostModel)) {
             return false;
         }
-
         CostModel costModel = (CostModel) o;
-
         return (costModel.getName().equals(((CostModel) o).getName())
                 && costModel.getType().equals(((CostModel) o).getType())
                 && costModel.getVar_rate().equals(((CostModel) o).getVar_rate())
                 && costModel.getFix_cost().equals(((CostModel) o).getFix_cost())
-                && costModel.getComponents().equals(((CostModel) o).getComponents())
                 && costModel.getDescription().equals(((CostModel) o).getDescription()));
     }
 }

@@ -10,6 +10,7 @@ import io.elastest.ece.persistance.HibernateConfiguration;
 import io.elastest.ece.persistance.QueryHelper;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.hibernate.Query;
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,6 +72,16 @@ public class APIControllerTest extends TestCase {
         logger.info("Setting up the Database connection.");
         checkAndConfigureHibernate();
         hibernateClient = HibernateClient.getInstance();
+        List<CostModel> oldCostModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        for(CostModel costModel : oldCostModels){
+            hibernateClient.deleteObject(costModel);
+        }
+
+        List<TJob> oldTjobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
+        for(TJob tJob : oldTjobs){
+            hibernateClient.deleteObject(tJob);
+        }
+
         logger.info("Creating Demo T-Job Values.");
         HashMap<String, String> test0Map = new HashMap<>();
         test0Map.put("cpus", "8.0");
@@ -82,13 +93,13 @@ public class APIControllerTest extends TestCase {
 
         logger.info("Creating Demo Cost Model Values.");
         HashMap varCosts = new HashMap();
-        varCosts.put("cpus", 50.0);
-        varCosts.put("memory", 10.0);
-        varCosts.put("disk", 1.0);
+        varCosts.put("cpus", 0.0);
+        varCosts.put("memory", 0.0);
+        varCosts.put("disk", 0.0);
         HashMap fixCost = new HashMap();
-        fixCost.put("deployment", 10.0);
+        fixCost.put("deployment", 0.0);
 
-        this.costModel = new CostModel("On Demand 10 + Charges", "ONDEMAND", fixCost, varCosts, null, "On Demand 5 per deployment, 50 per core, 10 per GB ram and 1 per GB disk");
+        this.costModel = new CostModel("Free Cost Model", "ONDEMAND", fixCost, varCosts, null, "Everything for free, test purposes");
         this.hibernateClient.persistObject(costModel);
     }
 
@@ -118,26 +129,60 @@ public class APIControllerTest extends TestCase {
         assertTrue(costModels.contains(costModel));
     }
 
-//    @Test
-//    public void testGetCostModel() {
-//        setup();
-//        apiController = new APIController();
-//        String name = costModel.getName();
-//        String description = costModel.getDescription();
-//        String fixName = (String) costModel.getFix_cost().keySet().toArray()[0];
-//        Double fixValue = costModel.getFix_cost().get(fixName);
-//        double cpus = costModel.getVar_rate().get("cpus");
-//        double memory = costModel.getVar_rate().get("memory");
-//        double disk = costModel.getVar_rate().get("disk");
-//
-//        apiController.addCostModel(name, description, fixName, fixValue, cpus, memory, disk, new ExtendedModelMap());
-//        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
-//        int index = costModels.indexOf(costModel);
-//        Long id = costModels.get(index).getId();
-//        CostModel obtained = (CostModel) hibernateClient.getObject(CostModel.class, id);
-//
-//        assertEquals(obtained, costModel);
-//    }
+    @Test
+    public void testGetCostModel() {
+        setup();
+        apiController = new APIController();
+        String name = costModel.getName();
+        String description = costModel.getDescription();
+        String fixName = (String) costModel.getFix_cost().keySet().toArray()[0];
+        Double fixValue = costModel.getFix_cost().get(fixName);
+        double cpus = costModel.getVar_rate().get("cpus");
+        double memory = costModel.getVar_rate().get("memory");
+        double disk = costModel.getVar_rate().get("disk");
+
+        apiController.addCostModel(name, description, fixName, fixValue, cpus, memory, disk, new ExtendedModelMap());
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        int index = costModels.indexOf(costModel);
+        Long id = costModels.get(index).getId();
+        CostModel obtained = (CostModel) hibernateClient.getObject(CostModel.class, id);
+
+        assertEquals(obtained, costModel);
+    }
+
+    @Test
+    public void testDeleteCostModel() {
+        setup();
+        apiController = new APIController();
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        int index = costModels.indexOf(costModel);
+        Long id = costModels.get(index).getId();
+
+        apiController.deleteCostModel(String.valueOf(id));
+
+        assertEquals(null, hibernateClient.getObject(CostModel.class, id));
+    }
+
+    @Test
+    public void testEstimatePost() {
+        setup();
+        apiController = new APIController();
+
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        int costModelIndex = costModels.indexOf(costModel);
+        Long costModelId = costModels.get(costModelIndex).getId();
+
+        List<TJob> tJobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
+        int tJobIndex = tJobs.indexOf(tJob);
+        Long tJobId = tJobs.get(tJobIndex).getId();
+
+        ExtendedModelMap model = new ExtendedModelMap();
+        apiController.estimatePost(String.valueOf(tJobId), String.valueOf(costModelId), model);
+
+        Double cost = (Double) model.get("estimate");
+
+        assertEquals(0d , cost);
+    }
 
     /**
      * Check and configure Hibernate
