@@ -157,7 +157,7 @@
                 <configuration>
                     <argLine>-Xmx1024m</argLine>
                     <environmentVariables>
-                        <HIBERNATEURL>jdbc:postgresql://postgres/ece</HIBERNATEURL>
+                        <HIBERNATEURL>jdbc:postgresql://160.85.4.164:5432/ece</HIBERNATEURL>
                         <HIBERNATEUSERNAME>elastest</HIBERNATEUSERNAME>
                         <HIBERNATEPASSWORD>elastestpassword</HIBERNATEPASSWORD>
                         <!--<HIBERNATEURL>jdbc:postgresql://localhost/ece2</HIBERNATEURL>-->
@@ -168,37 +168,37 @@
                     </environmentVariables>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>cobertura-maven-plugin</artifactId>-->
-                <!--<version>2.7</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>test</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>cobertura</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>cobertura</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
-    <!--<reporting>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>cobertura-maven-plugin</artifactId>-->
-                <!--<version>2.7</version>-->
-                <!--<configuration>-->
-                    <!--<check></check>-->
-                    <!--<formats>-->
-                        <!--<format>html</format>-->
-                        <!--<format>xml</format>-->
-                    <!--</formats>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
-    <!--</reporting>-->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <check></check>
+                    <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                    </formats>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>
