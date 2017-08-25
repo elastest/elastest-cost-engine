@@ -22,9 +22,7 @@ package io.elastest.ece.persistance;
 
 import io.elastest.ece.load.model.HibernateCredentials;
 import io.elastest.ece.model.CostModel;
-import io.elastest.ece.model.CostItem;
 import io.elastest.ece.model.TJob;
-import io.elastest.ece.model.TJobItem;
 import org.hibernate.cfg.Configuration;
 
 public class HibernateConfiguration {
@@ -32,7 +30,7 @@ public class HibernateConfiguration {
         Configuration conf = new Configuration();
 
         // add mandatory hibernate classes
-        conf.addAnnotatedClass(TJob.class).addAnnotatedClass(TJobItem.class).addAnnotatedClass(CostModel.class).addAnnotatedClass(CostItem.class);
+        conf.addAnnotatedClass(TJob.class).addAnnotatedClass(CostModel.class);
 
         // now set properties
         conf.setProperty("hibernate.connection.driver_class", credentials.getHibernateDriver())

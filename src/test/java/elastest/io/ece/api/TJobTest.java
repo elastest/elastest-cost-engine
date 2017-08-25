@@ -1,8 +1,11 @@
-package io.elastest.ece.model;
+package elastest.io.ece.api;
 
+import io.elastest.ece.model.CostModel;
+import io.elastest.ece.model.TJob;
+import junit.framework.TestCase;
+import org.junit.Test;
 
-
-import javax.persistence.*;
+import java.util.HashMap;
 
 /**
  * Copyright (c) 2017. Zuercher Hochschule fuer Angewandte Wissenschaften
@@ -20,29 +23,21 @@ import javax.persistence.*;
  * License for the specific language governing permissions and limitations
  * under the License.
  * <p>
- * Created by Manu Perez on 14/07/17.
+ * Created by Manu Perez on 25.08.17.
  */
 
-@Entity
-public class CostItem {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
-    private Double cost;
+public class TJobTest extends TestCase{
 
-    public CostItem(Double cost) {
-        this.cost = Double.valueOf(cost);
-    }
+    @Test
+    public void testEquals(){
+        TJob tJob = new TJob("tjob", new HashMap());
+        TJob tJob1 = new TJob("tjob", new HashMap());
 
-    public Long getId() {
-        return id;
-    }
+        tJob.setMetadata(new HashMap<>());
+        tJob1.setMetadata(new HashMap<>());
 
-    public double getCost() {
-        return cost;
-    }
+        assertNotSame(new Double(0), tJob);
+        assertEquals(tJob, tJob1);
 
-    public void setCost(double cost) {
-        this.cost = cost;
     }
 }

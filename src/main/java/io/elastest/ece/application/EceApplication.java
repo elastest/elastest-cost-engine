@@ -37,7 +37,7 @@ public class EceApplication {
 	 * Check number of parameters
 	 * @param args as string array
 	 */
-	private static void checkParameters(String[] args) {
+	public static void checkParameters(String[] args) {
 		if (args.length == 0) {
 			String log = "A configuration file path has to be provided (as argument), otherwise the Elastest Cost Engine cannot be properly loaded";
 			logger.error(log);
@@ -52,7 +52,7 @@ public class EceApplication {
 	 * Check whether parameter was help
 	 * @param param to be examined
 	 */
-	private static void checkHelp(String param) {
+	public static void checkHelp(String param) {
 		if (param.equals("-h") || param.equals("--help")) {
 			System.exit(0);
 		}
@@ -64,7 +64,7 @@ public class EceApplication {
 	 * Make sure configuration file is valid
 	 * @param param path
 	 */
-	private static void checkConfigurationFile(String param) {
+	public static void checkConfigurationFile(String param) {
 		try {
 			// create and parse configuration settings
 			Loader.createInstance(param);
@@ -81,7 +81,7 @@ public class EceApplication {
 	/**
 	 * Check and configure Hibernate
 	 */
-	private static void checkAndConfigureHibernate() {
+	public static void checkAndConfigureHibernate() {
 		try {
 			// get credentials
 			HibernateCredentials credentials = Loader.getSettings().getHibernateCredentials();
@@ -102,11 +102,11 @@ public class EceApplication {
 		outputProgressBar();
 	}
 
-	private static void outputProgressBar() {
+	public static void outputProgressBar() {
 		outputProgressBar("...");
 	}
 
-	private static void outputProgressBar(String text, Boolean ... emptyLine) {
+	public static void outputProgressBar(String text, Boolean ... emptyLine) {
 		if (emptyLine.length > 0 && emptyLine[0]) {
 			System.out.println();
 		}
