@@ -1,5 +1,7 @@
 package elastest.io.ece.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.elastest.ece.application.APIController;
 import io.elastest.ece.load.Loader;
 import io.elastest.ece.load.model.HibernateCredentials;
@@ -22,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.ui.ExtendedModelMap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -99,7 +102,7 @@ public class APIControllerTest extends TestCase {
         HashMap fixCost = new HashMap();
         fixCost.put("deployment", 0.0);
 
-        this.costModel = new CostModel("Free Cost Model", "ONDEMAND", fixCost, varCosts, null, "Everything for free, test purposes");
+        this.costModel = new CostModel("Free Cost Model", "ONDEMAND", fixCost, varCosts, new HashMap<>(), "Everything for free, test purposes");
         this.hibernateClient.persistObject(costModel);
     }
 
@@ -140,14 +143,17 @@ public class APIControllerTest extends TestCase {
         double cpus = costModel.getVar_rate().get("cpus");
         double memory = costModel.getVar_rate().get("memory");
         double disk = costModel.getVar_rate().get("disk");
+        ExtendedModelMap model = new ExtendedModelMap();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         apiController.addCostModel(name, description, fixName, fixValue, cpus, memory, disk, new ExtendedModelMap());
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
         int index = costModels.indexOf(costModel);
         Long id = costModels.get(index).getId();
         CostModel obtained = (CostModel) hibernateClient.getObject(CostModel.class, id);
-
-        assertEquals(obtained, costModel);
+        apiController.getCostModel(String.valueOf(id), model);
+        String costModelJson = (String) model.get("costModel");
+        assertEquals(costModelJson, gson.toJson(costModel));
     }
 
     @Test
@@ -184,6 +190,37 @@ public class APIControllerTest extends TestCase {
         assertEquals(0d , cost);
     }
 
+    @Test
+    public void testInit(){
+        setup();
+        apiController = new APIController();
+        apiController.init();
+
+        logger.info("Mocking Cost Models Initialized in the init() method.");
+        ArrayList<CostModel> result = new ArrayList();
+        HashMap varCosts = new HashMap();
+        varCosts.put("cpus", 50.0);
+        varCosts.put("memory", 10.0);
+        varCosts.put("disk", 1.0);
+        HashMap fixCost = new HashMap();
+        fixCost.put("deployment", 5.0);
+
+        CostModel costModel = new CostModel("On Demand 5 + Charges", "ONDEMAND", fixCost, varCosts, null, "On Demand 5 per deployment, 50 per core, 10 per GB ram and 1 per GB disk");
+
+        HashMap varCosts1 = new HashMap();
+        varCosts1.put("cpus", 1.0);
+        varCosts1.put("memory", 1.0);
+        varCosts1.put("disk", 1.0);
+        HashMap fixCost1 = new HashMap();
+        fixCost1.put("deployment", 10.0);
+
+        CostModel costModel1 = new CostModel("On demand 10 + Charges", "ONDEMAND", fixCost1, varCosts1, null, "On Demand 10 per deployment, 1 per core, 1 per GB ram and 1 per GB disk");
+
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        assertTrue(costModels.contains(costModel));
+        assertTrue(costModels.contains(costModel1));
+    }
+
     /**
      * Check and configure Hibernate
      */
@@ -205,26 +242,4 @@ public class APIControllerTest extends TestCase {
             System.exit(0);
         }
     }
-
-//    @Test
-//    public void testGetCostModel() {
-//        apiController = new APIController();
-//
-//        assertEquals(apiController.getCostModel("costModel0", null), "redirection");
-//    }
-//
-//    @Test
-//    public void testDeleteCostModel() {
-//        apiController = new APIController();
-//
-//        assertEquals(apiController.deleteCostModel("costModel0"), "redirection");
-//    }
-//
-//    @Test
-//    public void testEstimatePost(){
-//
-//        apiController = new APIController();
-//
-//        assertEquals(apiController.estimatePost("costModel0"), "redirection");
-//    }
 }
