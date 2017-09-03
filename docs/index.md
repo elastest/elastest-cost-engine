@@ -61,7 +61,17 @@ For now, the 0.0.2 version is using Mock up values to simmulate the interaction 
 ![ElasTest Cost Engine Mock up architecture](imgs/MockECE.png)
 
 The Cost Models are defined in a generic way so can be adapted to several cases from VM orchestrations, Service 
-instantiations and Services that contain VM orchestration as part of them. The used format is the following:
+instantiations and Services that contain VM orchestration as part of them. The data model used is the following:
+
+   - `name` : Name of the Cost Model.
+   - `type` : Cost Model type.
+   - `fix_cost` : Map containing the keys and values of the fields that need to be accounted in a fix bases.
+   - `var_rate` : Map containing the keys and values of the fields that need to be accounted under a pay as you go premises.
+   - `components` : Map containing the links to another Cost Models.
+   - `description` : Description of the Cost Model.
+
+
+An example of a Cost Model definition could be as the following:
 
 ```
 {
@@ -77,7 +87,7 @@ instantiations and Services that contain VM orchestration as part of them. The u
     "gb_hhd" : 0.0775
   },
   "components":{
-    "id" : "CostModelYId"
+    "Services" : ["CostModelYId"]
   },
   "description" : "On demand provisioning of a VM. Includes as a component a package X accounted by the Cost Model Y"
 }
