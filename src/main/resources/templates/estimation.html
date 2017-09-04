@@ -11,15 +11,18 @@
 
 </head>
 <body>
-<form method="get" action="/deletecostmodel">
+<form method="get" action="/estimate">
     <table>
         <thead>
         <tr>
-            <th>Cost Model Deleted Successfully.</th>
+            <th>Estimation</th>
         </tr>
         </thead>
         <tbody>
         <tr>
+        <td>
+            <tr th:text="${estimate}"></tr>
+        </td>
         <td>
             <button id="backButton">Go Back</button>
         </td>

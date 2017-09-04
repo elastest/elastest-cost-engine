@@ -28,10 +28,11 @@ The version 0.1 of the ElasTest Cost Engine, provides the following features:
 
 When the ECE is started correctly, a basic UI will be exposed at http://localhost:8888
 
-The 0.0.2 version of ECE initializes the databases and includes two different Cost Models as initial values. The T-Jobs are mocked up until the DSL is correctly defined. 
+The 0.1 version of ECE initializes the databases and includes two different Cost Models as initial values. The T-Jobs are 
+mocked up until the DSL is correctly defined. 
 
 The ECE UI offers the functionality to estimate the price of running a specified T-Job running under a Cost Model. 
-![ElasTest Cost Engine Demo Interface v0.0.2](imgs/CostEngine002Demo.png)
+![ElasTest Cost Engine Demo Interface v0.1](imgs/CostEngine002Demo.png)
 
 The ECE UI also ofers a simple way to manage all the Cost Models, creating, deleting and requesting for the json structure.
 
@@ -55,7 +56,7 @@ ECE will be in contact with the following ElasTest services:
 
 ![ElasTest Cost Engine final architecture](imgs/ECEArch.png)
 
-For now, the 0.0.2 version is using Mock up values to simmulate the interaction with the rest of the ElasTest Components.
+For now, the 0.1 version is using Mock up values to simmulate the interaction with the rest of the ElasTest Components.
 
 
 ![ElasTest Cost Engine Mock up architecture](imgs/MockECE.png)

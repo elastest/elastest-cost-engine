@@ -12,9 +12,7 @@ import io.elastest.ece.persistance.HibernateConfiguration;
 import io.elastest.ece.persistance.QueryHelper;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.hibernate.Query;
 import org.hibernate.cfg.Configuration;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
@@ -52,6 +50,7 @@ import java.util.List;
 @PropertySource("classpath:application.properties")
 public class APIControllerTest extends TestCase {
 
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(APIControllerTest.class.getName());
     private APIController apiController;
     private HibernateClient hibernateClient;
     private CostModel costModel;
@@ -64,9 +63,29 @@ public class APIControllerTest extends TestCase {
         return new TestSuite(APIControllerTest.class);
     }
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(APIControllerTest.class.getName());
+    /**
+     * Check and configure Hibernate
+     */
+    private static void checkAndConfigureHibernate() {
+        try {
+            // get credentials
+            HibernateCredentials credentials = Loader.getSettings().getHibernateCredentials();
 
-    public void setup(){
+            // create configuration
+            Configuration configuration = HibernateConfiguration.createConfiguration(credentials);
+
+            // create Hibernate
+            HibernateClient.createInstance(configuration);
+
+        } catch (Exception e) {
+            String log = String.format("Couldn't connect to Hibernate: %s", e.getMessage());
+            logger.error(log);
+            System.err.println(log);
+            System.exit(0);
+        }
+    }
+
+    public void setup() {
         try {
             Loader.createInstance();
         } catch (Exception e) {
@@ -76,12 +95,12 @@ public class APIControllerTest extends TestCase {
         checkAndConfigureHibernate();
         hibernateClient = HibernateClient.getInstance();
         List<CostModel> oldCostModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
-        for(CostModel costModel : oldCostModels){
+        for (CostModel costModel : oldCostModels) {
             hibernateClient.deleteObject(costModel);
         }
 
         List<TJob> oldTjobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
-        for(TJob tJob : oldTjobs){
+        for (TJob tJob : oldTjobs) {
             hibernateClient.deleteObject(tJob);
         }
 
@@ -126,7 +145,13 @@ public class APIControllerTest extends TestCase {
         double memory = costModel.getVar_rate().get("memory");
         double disk = costModel.getVar_rate().get("disk");
 
-        apiController.addCostModel(name, description, fixName, fixValue, cpus, memory, disk, new ExtendedModelMap());
+        String[] varNames = new String[]{"cpus", "memory", "disk"};
+        Double[] varValues = new Double[]{cpus, memory, disk};
+
+        String[] fixNames = new String[]{fixName};
+        Double[] fixValues = new Double[]{fixValue};
+
+        apiController.addCostModel(name, description, fixNames, fixValues, varNames, varValues, new ExtendedModelMap());
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
 
         assertTrue(costModels.contains(costModel));
@@ -145,8 +170,13 @@ public class APIControllerTest extends TestCase {
         double disk = costModel.getVar_rate().get("disk");
         ExtendedModelMap model = new ExtendedModelMap();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String[] varNames = new String[]{"cpus", "memory", "disk"};
+        Double[] varValues = new Double[]{cpus, memory, disk};
 
-        apiController.addCostModel(name, description, fixName, fixValue, cpus, memory, disk, new ExtendedModelMap());
+        String[] fixNames = new String[]{fixName};
+        Double[] fixValues = new Double[]{fixValue};
+
+        apiController.addCostModel(name, description, fixNames, fixValues, varNames, varValues, new ExtendedModelMap());
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
         int index = costModels.indexOf(costModel);
         Long id = costModels.get(index).getId();
@@ -187,11 +217,11 @@ public class APIControllerTest extends TestCase {
 
         Double cost = (Double) model.get("estimate");
 
-        assertEquals(0d , cost);
+        assertEquals(0d, cost);
     }
 
     @Test
-    public void testInit(){
+    public void testInit() {
         setup();
         apiController = new APIController();
         apiController.init();
@@ -221,25 +251,13 @@ public class APIControllerTest extends TestCase {
         assertTrue(costModels.contains(costModel1));
     }
 
-    /**
-     * Check and configure Hibernate
-     */
-    private static void checkAndConfigureHibernate() {
-        try {
-            // get credentials
-            HibernateCredentials credentials = Loader.getSettings().getHibernateCredentials();
+    @Test
+    public void testRedirections(){
+        apiController = new APIController();
 
-            // create configuration
-            Configuration configuration = HibernateConfiguration.createConfiguration(credentials);
-
-            // create Hibernate
-            HibernateClient.createInstance(configuration);
-
-        } catch (Exception e) {
-            String log = String.format("Couldn't connect to Hibernate: %s", e.getMessage());
-            logger.error(log);
-            System.err.println(log);
-            System.exit(0);
-        }
+        assertEquals("estimate", apiController.getEstimateCostModels(new ExtendedModelMap()));
+        assertEquals("deletecostmodel", apiController.getDeleteCostModel(new ExtendedModelMap()));
+        assertEquals("costmodeldetails", apiController.getCostModelDetails(new ExtendedModelMap()));
+        assertEquals("createcostmodel", apiController.getCreateCostModel());
     }
 }

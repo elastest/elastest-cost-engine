@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>ElasTest | ECE</title>
+</head>
+<body>
+<form method="post" action="/deleteCostModel">
+    <table>
+        <thead>
+        <tr>
+            <th>Delete Cost Model</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+        <tr th:each="costModel: ${costModels}">
+            <td th:text="${costModel.description}">planId</td>
+            <td>
+                <input type="radio" name="costModelId" th:value="${costModel.id}">
+            </td>
+        </tr>
+        </td>
+        <td>
+            <button id="deleteButton">Delete</button>
+        </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
+</html>

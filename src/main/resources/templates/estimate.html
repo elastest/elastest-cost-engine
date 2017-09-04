@@ -1,30 +1,52 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="/js/index.js"></script>
+    <meta charset="UTF-8">
     <title>ElasTest | ECE</title>
-
 </head>
 <body>
-<form method="get" action="/">
+<form method="post" action="/estimation">
     <table>
         <thead>
         <tr>
-            <th>Estimation</th>
+            <th>T-Job</th>
         </tr>
         </thead>
         <tbody>
         <tr>
+            <td>
+        <tr th:each="test: ${tests}">
+            <td th:text="${test.name}">testId</td>
+            <td>
+                <input type="radio" name="testId" th:value="${test.id}">
+            </td>
+        </tr>
+        </td>
         <td>
             <tr th:text="${estimate}"></tr>
         </td>
+        </tr>
+        </tbody>
+    </table>
+    <br><br>
+    <table>
+        <thead>
+        <tr>
+            <th>Cost Model</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+        <tr th:each="costModel: ${costModels}">
+            <td th:text="${costModel.description}">planId</td>
+            <td>
+                <input type="radio" name="costModelId" th:value="${costModel.id}">
+            </td>
+        </tr>
+        </td>
         <td>
-            <button id="backButton">Go Back</button>
+            <button id="estimateButton">Estimate</button>
         </td>
         </tr>
         </tbody>
@@ -32,4 +54,3 @@
 </form>
 </body>
 </html>
-

@@ -46,6 +46,7 @@ public class APIController {
 
     @PostConstruct
     public void init() {
+        //TODO: Communicate with TORM to get all the TJobs
         testCostModelValues();
         testTestValues();
     }
@@ -64,17 +65,63 @@ public class APIController {
         return "index";
     }
 
+    @RequestMapping(value = "/estimate", method = RequestMethod.GET)
+    public String getEstimateCostModels(Model model) {
+        logger.info("Creating test values.");
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        List<TJob> tJobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
+
+        logger.info("Adding attributes to the model.");
+        model.addAttribute("tests", tJobs);
+        model.addAttribute("costModels", costModels);
+        logger.info("Redirecting to the ECE's Cost Estimation Page.");
+        return "estimate";
+    }
+
+    @RequestMapping(value = "/deletecostmodel", method = RequestMethod.GET)
+    public String getDeleteCostModel(Model model) {
+        logger.info("Creating test values.");
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+
+        logger.info("Adding attributes to the model.");
+        model.addAttribute("costModels", costModels);
+        logger.info("Redirecting to the ECE's Delete Cost Model Page.");
+        return "deletecostmodel";
+    }
+
+    @RequestMapping(value = "/costmodeldetails", method = RequestMethod.GET)
+    public String getCostModelDetails(Model model) {
+        logger.info("Creating test values.");
+        HibernateClient hibernateClient = HibernateClient.getInstance();
+        List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+
+        logger.info("Adding attributes to the model.");
+        model.addAttribute("costModels", costModels);
+        logger.info("Redirecting to the ECE's Cost Model Details Page.");
+        return "costmodeldetails";
+    }
+
+    @RequestMapping(value = "/createcostmodel", method = RequestMethod.GET)
+    public String getCreateCostModel() {
+        logger.info("Redirecting to the ECE's Cost Model Creation Page.");
+        return "createcostmodel";
+    }
+
     @RequestMapping(value = "/costmodel", method = RequestMethod.POST)
-    public String addCostModel(@RequestParam String name, @RequestParam String description, @RequestParam String fixName, @RequestParam Double fixValue, @RequestParam double cpus, @RequestParam double memory, @RequestParam double disk, Model model) {
+    public String addCostModel(@RequestParam String name, @RequestParam String description, @RequestParam String[] fixNames, @RequestParam Double[] fixValues, @RequestParam String[] varNames, @RequestParam Double[] varValues, Model model) {
         logger.info("Creating Cost Model.");
         HashMap<String, Double> varCosts = new HashMap<>();
-        varCosts.put("cpus", cpus);
-        varCosts.put("memory", memory);
-        varCosts.put("disk", disk);
-
         HashMap<String, Double> fixCosts = new HashMap<>();
-        fixCosts.put(fixName, fixValue);
 
+        for (int i = 0; i < fixNames.length; i++) {
+            fixCosts.put(fixNames[i], fixValues[i]);
+        }
+
+        for (int i = 0; i < varNames.length; i++) {
+            varCosts.put(varNames[i], varValues[i]);
+        }
 
         CostModel costModel = new CostModel(name, "ONDEMAND", fixCosts, varCosts, null, description);
         logger.info("Persisting the created Cost Model into the DB");
@@ -104,40 +151,45 @@ public class APIController {
         return "costModelDeleted";
     }
 
-    @RequestMapping(value = "/estimate", method = RequestMethod.POST)
+    @RequestMapping(value = "/estimation", method = RequestMethod.GET)
+    public String getEstimate(@RequestParam("tJobId") String tJobId, @RequestParam("costModelId") String costModelId, Model model) {
+        return estimatePost(tJobId, costModelId, model);
+    }
+
+    @RequestMapping(value = "/estimation", method = RequestMethod.POST)
     public String estimatePost(@RequestParam String testId, @RequestParam String costModelId, Model model) {
         HibernateClient hibernateClient = HibernateClient.getInstance();
         CostModel costModel = (CostModel) hibernateClient.getObject(CostModel.class, Long.valueOf(costModelId));
         TJob tJob = (TJob) hibernateClient.getObject(TJob.class, Long.valueOf(testId));
         double totalCost = 0;
         String costModelType = costModel.getType();
-        if(costModelType.equalsIgnoreCase("ONDEMAND")){
+        if (costModelType.equalsIgnoreCase("ONDEMAND")) {
             Map<String, Double> fixCost = costModel.getFix_cost();
             Map<String, Double> varRate = costModel.getVar_rate();
             Map<String, String> components = costModel.getComponents();
             Map<String, String> metadata = tJob.getMetadata();
 
             logger.info("Adding all fix costs from the cost model.");
-            for(Object key : fixCost.keySet()){
+            for (Object key : fixCost.keySet()) {
                 totalCost += fixCost.get(key);
             }
 
             logger.info("Adding all the accounted variable costs in the model");
-            for(Object key : varRate.keySet()){
-                if(tJob.getMetadata().containsKey(key)){
+            for (Object key : varRate.keySet()) {
+                if (tJob.getMetadata().containsKey(key)) {
                     totalCost += (Double.parseDouble(metadata.get(key)) * (varRate.get(key)));
                 }
             }
 
             //TODO:add component costs.
             logger.info("Adding all the component costs.");
-        }else if(costModelType.equalsIgnoreCase("PAYG")){
+        } else if (costModelType.equalsIgnoreCase("PAYG")) {
             //TODO: implement
         }
 
         model.addAttribute("estimate", totalCost);
         logger.info("Returning an estimate for the test jobs: " + testId + " and the Cost Model: " + costModelId);
-        return "estimate";
+        return "estimation";
     }
 
     private ArrayList testCostModelValues() {
@@ -165,6 +217,11 @@ public class APIController {
 
         logger.info("Persisting demo values");
         HibernateClient hibernateClient = HibernateClient.getInstance();
+
+        List<CostModel> oldCostModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
+        for (CostModel oldCostModel : oldCostModels)
+            hibernateClient.deleteObject(oldCostModel);
+
         hibernateClient.persistObject(costModel);
         hibernateClient.persistObject(costModel1);
         return result;
@@ -192,6 +249,11 @@ public class APIController {
 
         logger.info("Persisting demo values");
         HibernateClient hibernateClient = HibernateClient.getInstance();
+
+        List<TJob> oldTJobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
+        for (TJob oldTJob : oldTJobs)
+            hibernateClient.deleteObject(oldTJob);
+
         hibernateClient.persistObject(tJob);
         hibernateClient.persistObject(tJob1);
         return result;
