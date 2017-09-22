@@ -6,20 +6,22 @@ node('docker') {
         mycontainer.inside("-u jenkins -v /var/run/docker.sock:/var/run/docker.sock:rw") {
             git 'https://github.com/elastest/elastest-cost-engine.git'
 
-            stage "Package"
-                echo ("Packaging")
-                sh 'mvn package -DskipTests'
-
             stage "Tests"
                 echo ("Starting tests")
                 sh 'mvn clean test'
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
 
+            stage "Package"
+                echo ("Packaging")
+                sh 'mvn package -DskipTests'
+
             stage "Archive artifacts"
                 archiveArtifacts artifacts: 'target/*.jar'
 
             stage "Build image - Package"
-                echo ("Building")
+                echo ("Building Components")
+                def postgresimage = docker.build("elastest/ece-postgres", "./postgres")
+                echo ("Building ECE Image")
                 def myimage = docker.build 'elastest/ece'
 
             stage "Run image"
@@ -27,6 +29,12 @@ node('docker') {
 
             stage "Publish"
                 echo ("Publishing")
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'elastestci-dockerhub',
+                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                    sh 'docker login -u "$USERNAME" -p "$PASSWORD"'
+                    postgresimage.push()
+                }
+
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'elastestci-dockerhub',
                     usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                     sh 'docker login -u "$USERNAME" -p "$PASSWORD"'
