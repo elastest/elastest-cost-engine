@@ -17,12 +17,8 @@ The version 0.1 of the ElasTest Cost Engine, provides the following features:
 
 2. Install Docker Compose. 
 
-3. Go to the `postgres` folder and build the database image:
-   - `docker build -t postgres .`
-4. Go back to the root folder of the repository and build the main ECE image:
-   - `docker build -t ece .`
-5. Run the image using the following command:
-   - `docker-compose up`
+3. From the root folder, run the image using the following command: 
+   - `sudo docker-compose up`
 
 ## Basic uasge
 
@@ -35,6 +31,15 @@ The ECE UI offers the functionality to estimate the price of running a specified
 ![ElasTest Cost Engine Demo Interface v0.1](imgs/CostEngine002Demo.png)
 
 The ECE UI also ofers a simple way to manage all the Cost Models, creating, deleting and requesting for the json structure.
+
+## Use-case specific GUI
+
+The ECE offers a set of separate graphical user interfaces for each of the followint usecases:
+
+- Create a Cost Model: http://localhost:8888/createcostmodel
+- Delete a Cost Model: http://localhost:8888/deletecostmodel
+- Get Cost Model details: http://localhost:8888/costmodeldetails
+- Estimate a TJob and Cost Model cost: http://localhost:8888/estimate
 
 ---
 
