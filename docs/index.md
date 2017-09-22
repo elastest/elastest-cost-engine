@@ -34,7 +34,7 @@ The ECE UI also ofers a simple way to manage all the Cost Models, creating, dele
 
 ## Use-case specific GUI
 
-The ECE offers a set of separate graphical user interfaces for each of the followint usecases:
+The ECE offers a set of separate graphical user interfaces for each of the following usecases:
 
 - Create a Cost Model: http://localhost:8888/createcostmodel
 - Delete a Cost Model: http://localhost:8888/deletecostmodel
