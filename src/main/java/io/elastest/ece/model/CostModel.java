@@ -39,7 +39,7 @@ public class CostModel {
     private Map<String, Double> var_rate;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private Map<String, String> components;
+    private Map<String, Object> components;
 
     private String description;
 
@@ -52,7 +52,7 @@ public class CostModel {
         this.fix_cost = fix_cost;
     }
 
-    public CostModel(String name, String type, Map<String, Double> fix_cost, Map<String, Double> var_rate, Map<String, String> components, String description) {
+    public CostModel(String name, String type, Map<String, Double> fix_cost, Map<String, Double> var_rate, Map<String, Object> components, String description) {
         this.name = name;
         this.type = type;
         this.fix_cost = fix_cost;
@@ -105,11 +105,11 @@ public class CostModel {
         this.var_rate = var_rate;
     }
 
-    public Map<String, String> getComponents() {
+    public Map<String, Object> getComponents() {
         return components;
     }
 
-    public void setComponents(Map<String, String> components) {
+    public void setComponents(Map<String, Object> components) {
         this.components = components;
     }
 

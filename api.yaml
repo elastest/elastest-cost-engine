@@ -186,9 +186,9 @@ definitions:
   EstimateBody:
     type: object
     properties:
-      testId:
+      tJobDefinition:
         type: string
-      costModelId:
+      tJobCostModel:
         type: string
   FixCost:
     type: object

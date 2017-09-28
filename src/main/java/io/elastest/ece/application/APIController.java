@@ -2,6 +2,7 @@ package io.elastest.ece.application;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.elastest.ece.load.Loader;
 import io.elastest.ece.model.CostModel;
 import io.elastest.ece.model.TJob;
 import io.elastest.ece.persistance.HibernateClient;
@@ -77,6 +78,20 @@ public class APIController {
         model.addAttribute("costModels", costModels);
         logger.info("Redirecting to the ECE's Cost Estimation Page.");
         return "estimate";
+    }
+
+    @RequestMapping(value = "/estimate", method = RequestMethod.POST)
+    public String estimateTJob(String tJobDefinition, String tJobCostModel, Model model){
+        Gson gson = new Gson();
+        CostModel costModel = gson.fromJson(tJobCostModel, CostModel.class);
+//        ArrayList<String> components = costModel.getComponents().get(Loader.getSettings().getServicesConstant());
+        ArrayList<String> components = (ArrayList<String>) costModel.getComponents().get("Services");
+        for(String component : components){
+            //TODO: Query ESM for each service Cost Model
+            // CostModel componentCostModel = esmDirver.getServiceCostModel(component);
+            // estimatePost(tJobDefinition, componentCostModel);
+        }
+        return "";
     }
 
     @RequestMapping(value = "/deletecostmodel", method = RequestMethod.GET)
@@ -166,7 +181,7 @@ public class APIController {
         if (costModelType.equalsIgnoreCase("ONDEMAND")) {
             Map<String, Double> fixCost = costModel.getFix_cost();
             Map<String, Double> varRate = costModel.getVar_rate();
-            Map<String, String> components = costModel.getComponents();
+            Map<String, Object> components = costModel.getComponents();
             Map<String, String> metadata = tJob.getMetadata();
 
             logger.info("Adding all fix costs from the cost model.");
