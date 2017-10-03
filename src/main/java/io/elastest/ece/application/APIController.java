@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Copyright (c) 2017. Zuercher Hochschule fuer Angewandte Wissenschaften
@@ -85,7 +82,7 @@ public class APIController {
         Gson gson = new Gson();
         CostModel costModel = gson.fromJson(tJobCostModel, CostModel.class);
 //        ArrayList<String> components = costModel.getComponents().get(Loader.getSettings().getServicesConstant());
-        ArrayList<String> components = (ArrayList<String>) costModel.getComponents().get("Services");
+        ArrayList<String> components = (ArrayList<String>) Arrays.asList(costModel.getComponents().get("Services"));
         for(String component : components){
             //TODO: Query ESM for each service Cost Model
             // CostModel componentCostModel = esmDirver.getServiceCostModel(component);
@@ -181,7 +178,7 @@ public class APIController {
         if (costModelType.equalsIgnoreCase("ONDEMAND")) {
             Map<String, Double> fixCost = costModel.getFix_cost();
             Map<String, Double> varRate = costModel.getVar_rate();
-            Map<String, Object> components = costModel.getComponents();
+            Map<String, String[]> components = costModel.getComponents();
             Map<String, String> metadata = tJob.getMetadata();
 
             logger.info("Adding all fix costs from the cost model.");
