@@ -19,8 +19,9 @@ node('docker') {
                 archiveArtifacts artifacts: 'target/*.jar'
 
             stage "Build image - Package"
-                echo ("Building Components")
-                def postgresimage = docker.build("elastest/ece-postgres", "./postgres")
+#                echo ("Building Components")
+#                def postgresimage = docker.build("elastest/ece-postgres", "./postgres")
+
                 echo ("Building ECE Image")
                 def myimage = docker.build 'elastest/ece'
 
@@ -29,11 +30,11 @@ node('docker') {
 
             stage "Publish"
                 echo ("Publishing")
-                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'elastestci-dockerhub',
-                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-                    sh 'docker login -u "$USERNAME" -p "$PASSWORD"'
-                    postgresimage.push()
-                }
+#                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'elastestci-dockerhub',
+#                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+#                    sh 'docker login -u "$USERNAME" -p "$PASSWORD"'
+#                    postgresimage.push()
+#                }
 
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'elastestci-dockerhub',
                     usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
