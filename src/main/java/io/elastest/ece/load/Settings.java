@@ -16,6 +16,7 @@
  */
 package io.elastest.ece.load;
 
+import io.elastest.ece.load.model.ElasTestSettings;
 import io.elastest.ece.load.model.HibernateCredentials;
 
 import java.util.Map;
@@ -44,6 +45,7 @@ public class Settings {
 
     // List of different settings that are being loaded from configuration file
     protected HibernateCredentials hibernateCredentials;
+    protected ElasTestSettings elasTestSettings;
     // Object for reading and accessing configuration properties
     private Properties properties;
 
@@ -105,5 +107,46 @@ public class Settings {
         }
 
         return hibernateCredentials;
+    }
+
+    /**
+     * Load ElasTest Settings
+     *
+     * @return
+     */
+    private ElasTestSettings loadElasTestSettings(){
+        ElasTestSettings elasTestSettings = new ElasTestSettings();
+        Map<String, String> env = System.getenv();
+
+        if(env.containsKey("ELASTESTTORMAPI"))
+            elasTestSettings.setElasTestTormAPI(env.get("ELASTESTTORMAPI"));
+        else
+            elasTestSettings.setElasTestTormAPI((String) properties.get("ElasTestTormAPI"));
+
+        if(env.containsKey("ELASTESTESMAPI"))
+            elasTestSettings.setElasTestESMAPI(env.get("ELASTESTESMAPI"));
+        else
+            elasTestSettings.setElasTestESMAPI((String) properties.get("ElasTestESMAPI"));
+
+        if(env.containsKey("ELASTESTTORMTJOBENDPOINT"))
+            elasTestSettings.setElasTestTormTJobEndpoint(env.get("ELASTESTTORMTJOBENDPOINT"));
+        else
+            elasTestSettings.setElasTestTormTJobEndpoint((String) properties.get("ElasTestTormTJobEndpoint"));
+
+        return elasTestSettings;
+    }
+
+    /**
+     * Access loaded ElasTest credentials
+     *
+     * @return elastest settings
+     */
+    public ElasTestSettings getElastestSettings(){
+
+        if(elasTestSettings == null){
+            elasTestSettings = loadElasTestSettings();
+        }
+
+        return elasTestSettings;
     }
 }

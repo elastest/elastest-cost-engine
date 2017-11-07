@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import io.elastest.ece.application.APIController;
 import io.elastest.ece.load.Loader;
 import io.elastest.ece.load.model.HibernateCredentials;
-import io.elastest.ece.model.CostModel;
+import io.elastest.ece.model.ElasTest.CostModel;
 import io.elastest.ece.model.TJob;
 import io.elastest.ece.persistance.HibernateClient;
 import io.elastest.ece.persistance.HibernateConfiguration;

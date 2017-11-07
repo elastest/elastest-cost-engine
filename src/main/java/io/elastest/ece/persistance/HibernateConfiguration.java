@@ -21,7 +21,7 @@ package io.elastest.ece.persistance;
 
 
 import io.elastest.ece.load.model.HibernateCredentials;
-import io.elastest.ece.model.CostModel;
+import io.elastest.ece.model.ElasTest.CostModel;
 import io.elastest.ece.model.TJob;
 import org.hibernate.cfg.Configuration;
 

@@ -1,6 +1,5 @@
 package elastest.io.ece.api;
 
-import io.elastest.ece.model.CostModel;
 import io.elastest.ece.model.TJob;
 import junit.framework.TestCase;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package io.elastest.ece.model;
+package io.elastest.ece.model.ElasTest;
 
 import javax.persistence.*;
 import java.util.Map;

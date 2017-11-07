@@ -2,8 +2,9 @@ package io.elastest.ece.application;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.elastest.ece.communication.APICaller;
 import io.elastest.ece.load.Loader;
-import io.elastest.ece.model.CostModel;
+import io.elastest.ece.model.ElasTest.CostModel;
 import io.elastest.ece.model.TJob;
 import io.elastest.ece.persistance.HibernateClient;
 import io.elastest.ece.persistance.QueryHelper;
@@ -55,6 +56,11 @@ public class APIController {
         HibernateClient hibernateClient = HibernateClient.getInstance();
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
         List<TJob> tJobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
+
+        String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint();
+        APICaller apiCaller = new APICaller();
+
+        
 
         logger.info("Adding attributes to the model.");
         model.addAttribute("tests", tJobs);
