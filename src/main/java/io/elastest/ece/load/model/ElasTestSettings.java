@@ -23,6 +23,7 @@ public class ElasTestSettings {
     private String ElasTestTormAPI;
     private String ElasTestTormTJobEndpoint;
     private String ElasTestESMAPI;
+    private String ElasTestESMCatalogEndpoint;
 
     public String getElasTestTormTJobEndpoint() {
         return ElasTestTormTJobEndpoint;
@@ -43,5 +44,12 @@ public class ElasTestSettings {
     }
     public void setElasTestESMAPI(String elasTestESMAPI) {
         ElasTestESMAPI = elasTestESMAPI;
+    }
+
+    public String getElasTestESMCatalogEndpoint() {
+        return ElasTestESMCatalogEndpoint;
+    }
+    public void setElasTestESMCatalogEndpoint(String elasTestESMCatalogEndpoint) {
+        ElasTestESMCatalogEndpoint = elasTestESMCatalogEndpoint;
     }
 }

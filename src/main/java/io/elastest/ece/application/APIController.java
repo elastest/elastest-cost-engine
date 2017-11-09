@@ -4,7 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.elastest.ece.communication.APICaller;
 import io.elastest.ece.load.Loader;
+import io.elastest.ece.load.model.ElasTestSettings;
 import io.elastest.ece.model.ElasTest.CostModel;
+import io.elastest.ece.model.ElasTest.EsmServiceCatalogResponse;
+import io.elastest.ece.model.ElasTest.TormTJobsResponse;
+import io.elastest.ece.model.HTTPResponse;
 import io.elastest.ece.model.TJob;
 import io.elastest.ece.persistance.HibernateClient;
 import io.elastest.ece.persistance.QueryHelper;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -58,11 +63,24 @@ public class APIController {
         List<TJob> tJobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
 
         String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint();
+        String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + Loader.getSettings().getElastestSettings().getElasTestESMCatalogEndpoint();
         APICaller apiCaller = new APICaller();
+        List<TormTJobsResponse> tjobs = new ArrayList<>();
+        EsmServiceCatalogResponse serviceCatalog = new EsmServiceCatalogResponse();
+        try {
+            // Get all TJobs
+            HTTPResponse response = apiCaller.get(new URL(tormURL));
+            tjobs = response.getAsListOfType(TormTJobsResponse.class);
 
-        
-
+            // Get all Services
+            response = apiCaller.get(new URL(esmURL));
+            serviceCatalog = (EsmServiceCatalogResponse) response.getAsClass(EsmServiceCatalogResponse.class);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
         logger.info("Adding attributes to the model.");
+        model.addAttribute("tjobs", tjobs);
+        model.addAttribute("serviceCatalog", serviceCatalog);
         model.addAttribute("tests", tJobs);
         model.addAttribute("costModels", costModels);
         logger.info("Redirecting to the ECE's Index Page.");

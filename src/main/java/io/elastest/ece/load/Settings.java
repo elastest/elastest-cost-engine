@@ -133,6 +133,11 @@ public class Settings {
         else
             elasTestSettings.setElasTestTormTJobEndpoint((String) properties.get("ElasTestTormTJobEndpoint"));
 
+        if(env.containsKey("ELASTESTESMCATALOGENDPOINT"))
+            elasTestSettings.setElasTestESMCatalogEndpoint(env.get("ELASTESTESMCATALOGENDPOINT"));
+        else
+            elasTestSettings.setElasTestESMCatalogEndpoint((String) properties.get("ElasTestESMCatalogEndpoint"));
+
         return elasTestSettings;
     }
 
