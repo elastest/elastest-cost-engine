@@ -2,12 +2,10 @@ package io.elastest.ece.application;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.elastest.ece.communication.APICaller;
 import io.elastest.ece.load.Loader;
-import io.elastest.ece.load.model.ElasTestSettings;
-import io.elastest.ece.model.ElasTest.CostModel;
-import io.elastest.ece.model.ElasTest.EsmServiceCatalogResponse;
-import io.elastest.ece.model.ElasTest.TormTJobsResponse;
+import io.elastest.ece.model.ElasTest.*;
 import io.elastest.ece.model.HTTPResponse;
 import io.elastest.ece.model.TJob;
 import io.elastest.ece.persistance.HibernateClient;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 
@@ -70,12 +69,13 @@ public class APIController {
         try {
             // Get all TJobs
             HTTPResponse response = apiCaller.get(new URL(tormURL));
+//            response.unescape();
             tjobs = response.getAsListOfType(TormTJobsResponse.class);
 
             // Get all Services
-            response = apiCaller.get(new URL(esmURL));
+            response = apiCaller.getXBrokerApiVersion(new URL(esmURL));
             serviceCatalog = (EsmServiceCatalogResponse) response.getAsClass(EsmServiceCatalogResponse.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
         logger.info("Adding attributes to the model.");
@@ -84,7 +84,7 @@ public class APIController {
         model.addAttribute("tests", tJobs);
         model.addAttribute("costModels", costModels);
         logger.info("Redirecting to the ECE's Index Page.");
-        return "index";
+        return "tJobSelection";
     }
 
     @RequestMapping(value = "/estimate", method = RequestMethod.GET)
@@ -102,12 +102,12 @@ public class APIController {
     }
 
     @RequestMapping(value = "/estimate", method = RequestMethod.POST)
-    public String estimateTJob(String tJobDefinition, String tJobCostModel, Model model){
+    public String estimateTJob(String tJobDefinition, String tJobCostModel, Model model) {
         Gson gson = new Gson();
         CostModel costModel = gson.fromJson(tJobCostModel, CostModel.class);
 //        ArrayList<String> components = costModel.getComponents().get(Loader.getSettings().getServicesConstant());
         ArrayList<String> components = (ArrayList<String>) Arrays.asList(costModel.getComponents().get("Services"));
-        for(String component : components){
+        for (String component : components) {
             //TODO: Query ESM for each service Cost Model
             // CostModel componentCostModel = esmDirver.getServiceCostModel(component);
             // estimatePost(tJobDefinition, componentCostModel);
@@ -226,6 +226,45 @@ public class APIController {
         model.addAttribute("estimate", totalCost);
         logger.info("Returning an estimate for the test jobs: " + testId + " and the Cost Model: " + costModelId);
         return "estimation";
+    }
+
+    @RequestMapping(value = "/tJobEstimation", method = RequestMethod.POST)
+    public String getTJobEstimation(@RequestParam("tJobId") String tJobId, Model model) {
+        APICaller apiCaller = new APICaller();
+        String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint() + "/" + tJobId;
+        TormTJobsResponse tJob;
+        try {
+            // Try to get the TJob with the selected Id from TORM
+            HTTPResponse response = apiCaller.get(new URL(tormURL));
+            tJob = (TormTJobsResponse) response.getAsClass(TormTJobsResponse.class);
+
+            // Try to get the services it's using.
+            String esmServiceString = tJob.getEsmServicesString();
+            if (!esmServiceString.equalsIgnoreCase("")) {
+                Gson gson = new Gson();
+                Type esmServiceArray = new TypeToken<ArrayList<EsmServiceStringObject>>() {}.getType();
+                ArrayList<EsmServiceStringObject> esmServices = gson.fromJson(esmServiceString, esmServiceArray);
+                ArrayList<EsmService> services = new ArrayList<>();
+                // For each service present on the TJob String get it's definition from the ESM and add them to a map
+                for (EsmServiceStringObject service : esmServices){
+                    if(service.getSelected()) {
+                        // Get the Service Type from the catalog
+                        String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + Loader.getSettings().getElastestSettings().getElasTestESMCatalogEndpoint();//getElasTestESMInstanceEndpoint() + service.getId();
+                        response = apiCaller.getXBrokerApiVersion(new URL(esmURL));
+                        EsmServiceCatalogResponse esmServiceCatalogResponse = (EsmServiceCatalogResponse) response.getAsClass(EsmServiceCatalogResponse.class);
+                        for(EsmService serviceType : esmServiceCatalogResponse.getServices()){
+                            if(serviceType.getId().equals(service.getId())){
+                                services.add(serviceType);
+                            }
+                        }
+                    }
+                }
+            }
+            //TODO: operate with the services list getting costs and estimating
+        } catch (Exception e) {
+            logger.error("No Tjobs were retrieved with the provided Id: " + tJobId);
+        }
+        return "";
     }
 
     private ArrayList testCostModelValues() {

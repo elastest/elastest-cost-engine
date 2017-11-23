@@ -24,6 +24,14 @@ public class ElasTestSettings {
     private String ElasTestTormTJobEndpoint;
     private String ElasTestESMAPI;
     private String ElasTestESMCatalogEndpoint;
+    private String ElasTestESMInstanceEndpoint;
+
+    public String getElasTestESMInstanceEndpoint() {
+        return ElasTestESMInstanceEndpoint;
+    }
+    public void setElasTestESMInstanceEndpoint(String elasTestESMInstanceEndpoint) {
+        ElasTestESMInstanceEndpoint = elasTestESMInstanceEndpoint;
+    }
 
     public String getElasTestTormTJobEndpoint() {
         return ElasTestTormTJobEndpoint;

@@ -138,6 +138,11 @@ public class Settings {
         else
             elasTestSettings.setElasTestESMCatalogEndpoint((String) properties.get("ElasTestESMCatalogEndpoint"));
 
+        if(env.containsKey("ELASTESTESMINSTANCEENDPOINT"))
+            elasTestSettings.setElasTestESMInstanceEndpoint(env.get("ELASTESTESMINSTANCEENDPOINT"));
+        else
+            elasTestSettings.setElasTestESMInstanceEndpoint((String) properties.get("ElasTestESMInstanceEndpoint"));
+
         return elasTestSettings;
     }
 

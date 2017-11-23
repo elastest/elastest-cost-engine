@@ -2,6 +2,7 @@ package io.elastest.ece.model;
 
 import com.google.gson.Gson;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,5 +77,9 @@ public class HTTPResponse {
         }
 
         return mapped;
+    }
+
+    public void unescape() {
+        this.object = StringEscapeUtils.unescapeJson(this.object);
     }
 }

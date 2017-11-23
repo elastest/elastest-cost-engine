@@ -32,10 +32,10 @@ public class TormTJobsResponse {
     private String imageName;
     private String name;
     private List<Map> parameters;
-    private TormTJobProject project;
+    private Object project;
     private String resultsPath;
-    private String sut;
-    private List tjobExexs;
+    private Object sut;
+    private List tjobExecs;
 
     public TormTJobsResponse() {
     }
@@ -103,10 +103,10 @@ public class TormTJobsResponse {
         this.parameters = parameters;
     }
 
-    public TormTJobProject getProject() {
+    public Object getProject() {
         return project;
     }
-    public void setProject(TormTJobProject project) {
+    public void setProject(Object project) {
         this.project = project;
     }
 
@@ -117,17 +117,17 @@ public class TormTJobsResponse {
         this.resultsPath = resultsPath;
     }
 
-    public String getSut() {
+    public Object getSut() {
         return sut;
     }
-    public void setSut(String sut) {
+    public void setSut(Object sut) {
         this.sut = sut;
     }
 
-    public List getTjobExexs() {
-        return tjobExexs;
+    public List getTjobExecs() {
+        return tjobExecs;
     }
-    public void setTjobExexs(List tjobExexs) {
-        this.tjobExexs = tjobExexs;
+    public void setTjobExecs(List tjobExecs) {
+        this.tjobExecs = tjobExecs;
     }
 }

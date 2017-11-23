@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>ElasTest | ECE</title>
+</head>
+<body>
+<form method="post" action="/tJobEstimation">
+    <table>
+        <thead>
+        <tr>
+            <th>T-Job</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+        <tr th:each="tjob: ${tjobs}">
+            <td th:text="${tjob.name}">testId</td>
+            <td>
+                <input type="radio" name="tJobId" th:value="${tjob.id}">
+            </td>
+        </tr>
+        </td>
+        <td>
+            <button id="estimateButton">Estimate</button>
+        </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
+</html>

@@ -76,4 +76,25 @@ public class APICaller {
         HttpResponse response = client.execute(request);
         return new HTTPResponse(IOUtils.toString(response.getEntity().getContent()));
     }
+
+    /**
+     * Perform GET query and return Response
+     * @param endpoint to be called
+     * @return Response object
+     * @throws Exception
+     */
+    public HTTPResponse getXBrokerApiVersion(URL endpoint) throws Exception {
+        // prepare connection
+        HttpClient client = HttpClientBuilder.create().build();
+
+        // create request
+        HttpGet request = new HttpGet(endpoint.toURI());
+        request.addHeader("Accept", "application/json");
+        request.addHeader("X-Broker-Api-Version", "2.12");
+        request.addHeader("Content-Type", "application/json");
+
+        // execute response
+        HttpResponse response = client.execute(request);
+        return new HTTPResponse(IOUtils.toString(response.getEntity().getContent()));
+    }
 }
