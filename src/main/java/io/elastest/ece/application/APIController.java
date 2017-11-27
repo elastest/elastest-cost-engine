@@ -272,12 +272,12 @@ public class APIController {
             }
 
             // Creating different estimation ranges depending on config file
-            HashMap<String, HashMap<String, Double>> estimations = new HashMap<>();
+            HashMap<String, LinkedHashMap<String, Double>> estimations = new HashMap<>();
             List<Integer> estimationRanges = Loader.getSettings().getEstimationSettings().getEstimationRange();
 
             // Creating estimations
             for (Integer range : estimationRanges) {
-                HashMap<String, Double> costReport = new HashMap<>();
+                LinkedHashMap<String, Double> costReport = new LinkedHashMap<>();
                 Double price = 0.0;
                 for (CostModel costModel : costModels) {
                     Map<String, Double> fix = costModel.getFix_cost();
