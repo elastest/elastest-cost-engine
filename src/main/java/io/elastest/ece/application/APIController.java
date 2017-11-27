@@ -238,33 +238,80 @@ public class APIController {
             HTTPResponse response = apiCaller.get(new URL(tormURL));
             tJob = (TormTJobsResponse) response.getAsClass(TormTJobsResponse.class);
 
+            ArrayList<EsmService> services = new ArrayList<>();
             // Try to get the services it's using.
             String esmServiceString = tJob.getEsmServicesString();
             if (!esmServiceString.equalsIgnoreCase("")) {
                 Gson gson = new Gson();
-                Type esmServiceArray = new TypeToken<ArrayList<EsmServiceStringObject>>() {}.getType();
+                Type esmServiceArray = new TypeToken<ArrayList<EsmServiceStringObject>>() {
+                }.getType();
                 ArrayList<EsmServiceStringObject> esmServices = gson.fromJson(esmServiceString, esmServiceArray);
-                ArrayList<EsmService> services = new ArrayList<>();
                 // For each service present on the TJob String get it's definition from the ESM and add them to a map
-                for (EsmServiceStringObject service : esmServices){
-                    if(service.getSelected()) {
+                for (EsmServiceStringObject service : esmServices) {
+                    if (service.getSelected()) {
                         // Get the Service Type from the catalog
                         String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + Loader.getSettings().getElastestSettings().getElasTestESMCatalogEndpoint();//getElasTestESMInstanceEndpoint() + service.getId();
                         response = apiCaller.getXBrokerApiVersion(new URL(esmURL));
                         EsmServiceCatalogResponse esmServiceCatalogResponse = (EsmServiceCatalogResponse) response.getAsClass(EsmServiceCatalogResponse.class);
-                        for(EsmService serviceType : esmServiceCatalogResponse.getServices()){
-                            if(serviceType.getId().equals(service.getId())){
+                        for (EsmService serviceType : esmServiceCatalogResponse.getServices()) {
+                            if (serviceType.getId().equals(service.getId())) {
                                 services.add(serviceType);
                             }
                         }
                     }
                 }
             }
-            //TODO: operate with the services list getting costs and estimating
+            // Extract the Cost models out of the services that are being used plus the tJob cost model
+            ArrayList<CostModel> costModels = new ArrayList<>();
+//            models.add(tJob.getCost());
+            for (EsmService service : services) {
+                List<EsmPlan> plans = service.getPlans();
+                for (EsmPlan plan : plans) {
+                    costModels.add(plan.getMetadata().getCosts());
+                }
+            }
+
+            // Creating different estimation ranges depending on config file
+            HashMap<String, HashMap<String, Double>> estimations = new HashMap<>();
+            List<Integer> estimationRanges = Loader.getSettings().getEstimationSettings().getEstimationRange();
+
+            // Creating estimations
+            for (Integer range : estimationRanges) {
+                HashMap<String, Double> costReport = new HashMap<>();
+                Double price = 0.0;
+                for (CostModel costModel : costModels) {
+                    Map<String, Double> fix = costModel.getFix_cost();
+                    Map<String, Double> var = costModel.getVar_rate();
+
+                    // Add fix values to the cost report
+                    Iterator itFix = fix.keySet().iterator();
+                    while (itFix.hasNext()) {
+                        String key = (String) itFix.next();
+                        Double value = fix.get(key);
+                        costReport.put(key, value);
+                        price = price + value;
+                    }
+
+                    // Add variable rate values to the cost report
+                    Iterator varFix = var.keySet().iterator();
+                    while (varFix.hasNext()) {
+                        String key = (String) varFix.next();
+                        Double value = var.get(key) * range;
+                        costReport.put(key, value);
+                        price = price + value;
+                    }
+                }
+                // Add the final field and value for the cost estimation
+                costReport.put("Cost Estimation", price);
+
+                estimations.put("Estimation based on " + range + " minutes", costReport);
+            }
+            model.addAttribute("estimations", estimations);
+
         } catch (Exception e) {
             logger.error("No Tjobs were retrieved with the provided Id: " + tJobId);
         }
-        return "";
+        return "estimation";
     }
 
     private ArrayList testCostModelValues() {

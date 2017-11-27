@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class EsmPlanMetadata {
     private String bullets;
-    private Map costs;
+    private CostModel costs;
     private String displayName;
     private Map extras;
 
@@ -38,11 +38,11 @@ public class EsmPlanMetadata {
         this.bullets = bullets;
     }
 
-    public Map getCosts() {
+    public CostModel getCosts() {
         return costs;
     }
 
-    public void setCosts(Map costs) {
+    public void setCosts(CostModel costs) {
         this.costs = costs;
     }
 

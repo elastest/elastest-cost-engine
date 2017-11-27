@@ -13,21 +13,21 @@
 <body>
 <form method="get" action="/estimate">
     <table>
-        <thead>
         <tr>
-            <th>Estimation</th>
+            <td th:each="estimation : ${estimations}">
+                <table>
+                    <thead>
+                        <th th:text="${estimate.key}"></th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td th:text="${estimation.value.key}"></td>
+                            <td th:text="${estimation.value.value}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
         </tr>
-        </thead>
-        <tbody>
-        <tr>
-        <td>
-            <tr th:text="${estimate}"></tr>
-        </td>
-        <td>
-            <button id="backButton">Go Back</button>
-        </td>
-        </tr>
-        </tbody>
     </table>
 </form>
 </body>

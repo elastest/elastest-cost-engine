@@ -17,10 +17,10 @@
 package io.elastest.ece.load;
 
 import io.elastest.ece.load.model.ElasTestSettings;
+import io.elastest.ece.load.model.EstimationSettings;
 import io.elastest.ece.load.model.HibernateCredentials;
 
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Copyright (c) 2015. Zuercher Hochschule fuer Angewandte Wissenschaften
@@ -46,6 +46,7 @@ public class Settings {
     // List of different settings that are being loaded from configuration file
     protected HibernateCredentials hibernateCredentials;
     protected ElasTestSettings elasTestSettings;
+    protected EstimationSettings estimationSettings;
     // Object for reading and accessing configuration properties
     private Properties properties;
 
@@ -57,6 +58,41 @@ public class Settings {
     }
 
     //=============== Hibernate credentials and settings
+
+    /**
+     * Load Estimation Settings
+     *
+     * @return etimationSettings
+     */
+    private EstimationSettings loadEstimationSettings() {
+        EstimationSettings estimationSettings = new EstimationSettings();
+        Map<String, String> env = System.getenv();
+
+        if (env.containsKey("ESTIMATIONRANGE")) {
+            List range = new ArrayList<>();
+            range.addAll(Arrays.asList(env.get("EstimationRange").split(",")));
+            estimationSettings.setEstimationRange(range);
+        } else {
+            List range = new ArrayList<>();
+            range.addAll(Arrays.asList(properties.getProperty("EstimationRange").split(",")));
+            estimationSettings.setEstimationRange(range);        }
+
+        return estimationSettings;
+    }
+
+    /**
+     * Access loaded Estimation settings
+     *
+     * @return estimation settings
+     */
+    public EstimationSettings getEstimationSettings() {
+
+        if (estimationSettings == null) {
+            estimationSettings = loadEstimationSettings();
+        }
+
+        return estimationSettings;
+    }
 
     /**
      * Load Hibernate credentials
@@ -114,31 +150,31 @@ public class Settings {
      *
      * @return
      */
-    private ElasTestSettings loadElasTestSettings(){
+    private ElasTestSettings loadElasTestSettings() {
         ElasTestSettings elasTestSettings = new ElasTestSettings();
         Map<String, String> env = System.getenv();
 
-        if(env.containsKey("ELASTESTTORMAPI"))
+        if (env.containsKey("ELASTESTTORMAPI"))
             elasTestSettings.setElasTestTormAPI(env.get("ELASTESTTORMAPI"));
         else
             elasTestSettings.setElasTestTormAPI((String) properties.get("ElasTestTormAPI"));
 
-        if(env.containsKey("ELASTESTESMAPI"))
+        if (env.containsKey("ELASTESTESMAPI"))
             elasTestSettings.setElasTestESMAPI(env.get("ELASTESTESMAPI"));
         else
             elasTestSettings.setElasTestESMAPI((String) properties.get("ElasTestESMAPI"));
 
-        if(env.containsKey("ELASTESTTORMTJOBENDPOINT"))
+        if (env.containsKey("ELASTESTTORMTJOBENDPOINT"))
             elasTestSettings.setElasTestTormTJobEndpoint(env.get("ELASTESTTORMTJOBENDPOINT"));
         else
             elasTestSettings.setElasTestTormTJobEndpoint((String) properties.get("ElasTestTormTJobEndpoint"));
 
-        if(env.containsKey("ELASTESTESMCATALOGENDPOINT"))
+        if (env.containsKey("ELASTESTESMCATALOGENDPOINT"))
             elasTestSettings.setElasTestESMCatalogEndpoint(env.get("ELASTESTESMCATALOGENDPOINT"));
         else
             elasTestSettings.setElasTestESMCatalogEndpoint((String) properties.get("ElasTestESMCatalogEndpoint"));
 
-        if(env.containsKey("ELASTESTESMINSTANCEENDPOINT"))
+        if (env.containsKey("ELASTESTESMINSTANCEENDPOINT"))
             elasTestSettings.setElasTestESMInstanceEndpoint(env.get("ELASTESTESMINSTANCEENDPOINT"));
         else
             elasTestSettings.setElasTestESMInstanceEndpoint((String) properties.get("ElasTestESMInstanceEndpoint"));
@@ -151,9 +187,9 @@ public class Settings {
      *
      * @return elastest settings
      */
-    public ElasTestSettings getElastestSettings(){
+    public ElasTestSettings getElastestSettings() {
 
-        if(elasTestSettings == null){
+        if (elasTestSettings == null) {
             elasTestSettings = loadElasTestSettings();
         }
 
