@@ -14,17 +14,19 @@
 <form method="get" action="/estimate">
     <table>
         <tr>
+            <td th:text="${estimations}"></td>
             <td th:each="estimation : ${estimations}">
                 <table>
                     <thead>
-                        <th th:text="${estimation.key}"></th>
+                    <th th:text="${estimation}"></th>
+                    <th th:text="${estimation.key}"></th>
                     </thead>
                     <tbody>
-                        <tr th:with="current=${estimation.value}">
-                            <td th:text="${current}"></td>
-                            <tr th:each="cost : ${current}">
-                                <td th:text="${cost.key}"></td>
-                                <td th:text="${cost.value}"></td>
+                        <tr>
+                            <td th:text="${estimation.value}"></td>
+                            <tr th:each="estim : ${estimationList}">
+                                <td th:text="${estim}"></td>
+                                <!--<td th:text="${estim.value}"></td>-->
                             </tr>
 
                             <!--<td th:text="${current.deployment}"></td>-->

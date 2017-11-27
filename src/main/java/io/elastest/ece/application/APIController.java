@@ -273,6 +273,7 @@ public class APIController {
 
             // Creating different estimation ranges depending on config file
             HashMap<String, LinkedHashMap<String, Double>> estimations = new HashMap<>();
+            LinkedList<Map<String,Double>> estimationList = new LinkedList<>();
             List<Integer> estimationRanges = Loader.getSettings().getEstimationSettings().getEstimationRange();
 
             // Creating estimations
@@ -305,8 +306,10 @@ public class APIController {
                 costReport.put("Cost Estimation", price);
 
                 estimations.put("Estimation based on " + range + " minutes", costReport);
+                estimationList.add(costReport);
             }
             model.addAttribute("estimations", estimations);
+            model.addAttribute("estimationList", estimationList);
 
         } catch (Exception e) {
             logger.error("No Tjobs were retrieved with the provided Id: " + tJobId);
