@@ -11,31 +11,32 @@
 
 </head>
 <body>
-<form method="get" action="/estimate">
+<form method="get" action="/">
     <table>
         <tr>
-            <td th:text="${estimations}"></td>
             <td th:each="estimation : ${estimations}">
                 <table>
                     <thead>
-                    <th th:text="${estimation}"></th>
-                    <th th:text="${estimation.key}"></th>
+                    <tr>
+                        <th th:text="${estimation.key}"></th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td th:text="${estimation.value}"></td>
-                            <tr th:each="estim : ${estimationList}">
-                                <td th:text="${estim}"></td>
-                                <!--<td th:text="${estim.value}"></td>-->
-                            </tr>
-
-                            <!--<td th:text="${current.deployment}"></td>-->
-                        </tr>
+                    <tr>
+                        <th>Accounted field</th>
+                        <th>Price</th>
+                    <tr th:each="estim : ${estimation.value}">
+                        <td th:text="${estim.key}"></td>
+                        <td th:text="${estim.value}"></td>
+                    </tr>
+                    </tr>
                     </tbody>
                 </table>
             </td>
         </tr>
     </table>
+    <br>
+    <button id="estimateButton">Back</button>
 </form>
 </body>
 </html>
