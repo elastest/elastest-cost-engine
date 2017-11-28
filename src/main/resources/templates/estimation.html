@@ -6,89 +6,65 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js">
-    <!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">-->
-    <!--<link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.0.0-beta.4/dist/css/bootstrap-material-design.min.css" integrity="sha384-R80DC0KVBO4GSTw+wZ5x2zn2pu4POSErBkf8/fSFhPXHxvHJydT0CSgAP2Yo2r4I" crossorigin="anonymous">-->
+    <!--<link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js">-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.0.0-beta.4/dist/css/bootstrap-material-design.min.css"
+          integrity="sha384-R80DC0KVBO4GSTw+wZ5x2zn2pu4POSErBkf8/fSFhPXHxvHJydT0CSgAP2Yo2r4I" crossorigin="anonymous">
     <script src="/js/index.js"></script>
     <title>ElasTest | ECE</title>
 
 
 </head>
-<body>
+<body style="background-color:#dedede;">
 <form method="get" action="/">
 
-    <div th:each="estimation : ${estimations}" _ngcontent-c10="" layout="column" layout-gt-sm="row">
-        <div _ngcontent-c10="" flex-gt-sm="100">
-            <md-card _ngcontent-c10="" class="mat-card">
-                <div _ngcontent-c10="" class="pad-right-sm" layout="row" layout-align="start center">
-                    <!----><span _ngcontent-c10="">
-                        <md-card-title _ngcontent-c10="" class="mat-card-title " th:text="${estimation.key}">Estimation Key</md-card-title>
+    <div style="background-color:#dedede;">
+        <div class="card" style="padding:15px; background-color: #f5f5f5;">
+            <span><h4 class="card-title "><b>ECE | Cost Estimation</b></h4></span>
+        </div>
+        <div class="card-deck" style="padding-top: 15px;">
+            <div th:each="estimation : ${estimations}" layout="column" layout-gt-sm="row">
+                <div class="container" style="width: 40rem;">
+                    <div class="card">
+                        <div class="pad-right-sm card-header" layout="row" layout-align="start center">
+                            <!----><span _ngcontent-c10="">
+                    <h4 class="card-title " th:text="${estimation.key}"><b>Estimation Key</b></h4>
                     </span>
-                </div>
-                <md-divider _ngcontent-c10="" aria-orientation="horizontal" class="mat-divider" role="separator"></md-divider>
-                <md-divider _ngcontent-c10="" aria-orientation="horizontal" class="mat-divider" role="separator"></md-divider>
-                <td-data-table _ngcontent-c10="" class="scroll_table" _nghost-c13="">
-                    <div _ngcontent-c13="" class="mat-table-container" title="">
-                        <table _ngcontent-c13="" td-data-table="" _nghost-c15="" class="td-data-table mat-clickable">
-                            <thead _ngcontent-c15="">
-                            <tr _ngcontent-c15="" td-data-table-row="" _nghost-c18="" class="td-data-table-row"> <!----><!---->
-                                <th _ngcontent-c13="" td-data-table-column="" _nghost-c16="" class="td-data-table-column"><!---->
-                                    <span _ngcontent-c16="" class="md-caption">  <span _ngcontent-c13="" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Accounted Field</span>  </span>
-                                    <span _ngcontent-c16="" class="md-caption">  <span _ngcontent-c13="" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Price</span>  </span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody _ngcontent-c13=""><!---->
-                            <tr th:each="estim : ${estimation.value}" _ngcontent-c13="" td-data-table-row="" _nghost-c18="" class="td-data-table-row" tabindex="-1"> <!----> <!---->
-                                <td th:text="${estim.key}" _ngcontent-c13="" td-data-table-cell="" _nghost-c19="" class="td-data-table-cell"> <!----><span _ngcontent-c13="" class="md-body-1" >key</span> <!----> </td>
-                                <td th:text="${estim.value}" _ngcontent-c13="" td-data-table-cell="" _nghost-c19="" class="td-data-table-cell"> <!----><span _ngcontent-c13="" class="md-body-1">value</span> <!----> </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        </div>
+
+                        <div class="card-body">
+                            <div>
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th style="padding: 15px;">
+                                            <span>Accounted Field</span>
+                                        </th>
+                                        <th style="padding: 15px;">
+                                            <span>Price</span>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="estim : ${estimation.value}">
+                                        <td th:if="${estim.key} != 'Cost Estimation'" style="padding-left: 15px; padding-right: 15px;" th:text="${estim.key}"></td>
+                                        <td th:if="${estim.key} != 'Cost Estimation'" style="padding-left: 15px; padding-right: 15px;" th:text="${estim.value}"></td>
+                                        <th th:if="${estim.key} == 'Cost Estimation'" style="padding-left: 15px; padding-right: 15px;" th:text="${estim.key}"></th>
+                                        <th th:if="${estim.key} == 'Cost Estimation'" style="padding-left: 15px; padding-right: 15px;" th:text="${estim.value}"></th>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </td-data-table>
-            </md-card>
+                </div>
+                <br>
+            </div>
+        </div>
+        <div style="padding: 15px;">
+            <button type="submit" class="btn btn-outline-warning" style="background-color: #ffac2f; color: white; border-color: antiquewhite#ffac2f;">Back</button>
         </div>
     </div>
-    <div _ngcontent-c10="" class="push" layout="row">
-        <button id="estimateButton" _ngcontent-c10="" class="mat-raised-button mat-accent" color="accent" md-raised-button="" tabindex="0"><span
-                class="mat-button-wrapper">Back</span>
-            <div class="mat-button-ripple mat-ripple" md-ripple=""></div>
-            <div class="mat-button-focus-overlay"></div>
-        </button>
-    </div>
-
-    <!--<table>-->
-        <!--<tr>-->
-            <!--<td th:each="estimation : ${estimations}">-->
-                <!--<table>-->
-                    <!--<thead>-->
-                    <!--<tr>-->
-                        <!--<th th:text="${estimation.key}"></th>-->
-                    <!--</tr>-->
-                    <!--</thead>-->
-                    <!--<tbody>-->
-                    <!--<tr>-->
-                        <!--<th>Accounted field</th>-->
-                        <!--<th>Price</th>-->
-                    <!--<tr th:each="estim : ${estimation.value}">-->
-                        <!--<td th:text="${estim.key}"></td>-->
-                        <!--<td th:text="${estim.value}"></td>-->
-                    <!--</tr>-->
-                    <!--</tr>-->
-                    <!--</tbody>-->
-                <!--</table>-->
-            <!--</td>-->
-        <!--</tr>-->
-    <!--</table>-->
-    <!--<br>-->
-    <!--<button id="estimateButton" _ngcontent-c10="" class="mat-raised-button mat-accent" color="accent" md-raised-button=""><span class="mat-button-wrapper">Back</span>-->
-        <!--<div class="mat-button-ripple mat-ripple" md-ripple=""></div>-->
-        <!--<div class="mat-button-focus-overlay"></div>-->
-    <!--</button>-->
 </form>
-
-<script src="node_modules/material-components-web/dist/material-components-web.js"></script>
-<script>mdc.autoInit()</script>
 </body>
 </html>
