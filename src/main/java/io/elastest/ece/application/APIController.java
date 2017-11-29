@@ -289,6 +289,9 @@ public class APIController {
                     while (itFix.hasNext()) {
                         String key = (String) itFix.next();
                         Double value = fix.get(key);
+                        // Check if the field is already present
+                        if(costReport.containsKey(key))
+                            value = value + costReport.get(key);
                         costReport.put(key, value);
                         price = price + value;
                     }
@@ -298,6 +301,9 @@ public class APIController {
                     while (varFix.hasNext()) {
                         String key = (String) varFix.next();
                         Double value = var.get(key) * range;
+                        // Check if the field is already present
+                        if(costReport.containsKey(key))
+                            value = value + costReport.get(key);
                         costReport.put(key, value);
                         price = price + value;
                     }
