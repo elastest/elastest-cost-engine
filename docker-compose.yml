@@ -20,3 +20,4 @@ services:
       - ELASTESTESMCATALOGENDPOINT=/v2/catalog
       - ELASTESTESMINSTANCEENDPOINT=/v2/et/service_instances/
       - HIBERNATEURL=jdbc:postgresql://postgres/ece
+      - ESTIMATIONRANGE=1,4,20,60

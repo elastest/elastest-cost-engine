@@ -6,10 +6,9 @@ The ECE is a service that needs information from the ElasTest Service Manager (E
 
 ## Features
 
-The version 0.1 of the ElasTest Cost Engine, provides the following features:
+The version 0.5.0 of the ElasTest Cost Engine, provides the following features:
 
-- Estimate basic costs of T-Job executions based on already existing cost models.
-- Create and Manage Cost Models
+- Estimate costs of T-Job executions based on the existing Service cost models defined by the [ESM](https://github.com/elastest/elastest-service-manager).
 
 ## How to run
 
@@ -22,24 +21,21 @@ The version 0.1 of the ElasTest Cost Engine, provides the following features:
 
 ## Basic uasge
 
-When the ECE is started correctly, a basic UI will be exposed at http://localhost:8888
+When the ECE is instantiated, a basic UI will be exposed at http://localhost:8888
 
-The 0.1 version of ECE initializes the databases and includes two different Cost Models as initial values. The T-Jobs are 
-mocked up until the DSL is correctly defined. 
+The 0.5.0 version of ECE uses real data coming from different ElasTest Components. The T-Jobs are 
+pulled from the [TORM](https://github.com/elastest/elastest-torm) and the Cost Models that are used come from whatever ElasTest Services are used.
 
-The ECE UI offers the functionality to estimate the price of running a specified T-Job running under a Cost Model. 
-![ElasTest Cost Engine Demo Interface v0.1](imgs/CostEngine002Demo.png)
+The ECE UI offers the functionality to estimate the price of running a specified T-Job running for different time intervals. 
+![ElasTest Cost Engine Preconfigured Estimations Page](imgs/ECEPreconfiguredEstimations.png)
 
-The ECE UI also ofers a simple way to manage all the Cost Models, creating, deleting and requesting for the json structure.
+Even though it is not used in this version, the ECE UI also ofers a simple way to manage all the Cost Models, creating, deleting and requesting for the json structure.
 
 ## Use-case specific GUI
 
-The ECE offers a set of separate graphical user interfaces for each of the following usecases:
+The ECE offers a graphical user interface for the following usecase:
 
-- Create a Cost Model: http://localhost:8888/createcostmodel
-- Delete a Cost Model: http://localhost:8888/deletecostmodel
-- Get Cost Model details: http://localhost:8888/costmodeldetails
-- Estimate a TJob and Cost Model cost: http://localhost:8888/estimate
+- Estimate a TJob execution cost based on time basis using a predefined configuration or a specified value: http://localhost:8888/
 
 ---
 
@@ -47,6 +43,14 @@ The ECE offers a set of separate graphical user interfaces for each of the follo
 
 
 ECE is developed using Java and Spring MVC. 
+
+## Development Environment
+
+- Java 8 or higher. 
+- Maven 3 or higher.
+- Preferred IDE that can use Maven, Java and HTML.
+
+
 ### Architecture
 
 The ElasTest Cost Engine has aims to provide a [HTTP Rest API](http://elastest.io/docs/api/ece/) that computes cost 
@@ -61,8 +65,7 @@ ECE will be in contact with the following ElasTest services:
 
 ![ElasTest Cost Engine final architecture](imgs/ECEArch.png)
 
-For now, the 0.1 version is using Mock up values to simmulate the interaction with the rest of the ElasTest Components.
-
+For now, the 0.5.0 version is using part of the final architecture and it will be completed as the project and the rest of ElasTest Components advance.
 
 ![ElasTest Cost Engine Mock up architecture](imgs/MockECE.png)
 

@@ -71,7 +71,7 @@ public class Settings {
         if (env.containsKey("ESTIMATIONRANGE")) {
             List range = new ArrayList<>();
             List intRange = new ArrayList<>();
-            range.addAll(Arrays.asList(env.get("EstimationRange").split(",")));
+            range.addAll(Arrays.asList(env.get("ESTIMATIONRANGE").split(",")));
             for (int i = 0; i < range.size(); i++) {
                 intRange.add(Integer.parseInt((String) range.get(i)));
             }

@@ -23,7 +23,7 @@ The landing page of ECE allows to select between the standard (preconfigured) ti
 
 All the estimations are done based on which services are used in the TJob and their own cost definitions.
 
-By selecting the TJobs on the first menu, the estimations will be based on the ammount of minutes defined in the [configuration file](https://github.com/elastest/elastest-cost-engine/blob/master/conf/ece.conf).
+By selecting the TJobs on the first menu, the estimations will be based on the ammount of minutes defined in the [configuration file](https://github.com/elastest/elastest-cost-engine/blob/master/conf/ece.conf) and/or as an environment variable on the [docker-compose](https://github.com/elastest/elastest-cost-engine/blob/master/docker-compose.yml) file.
 
 ![ElasTest Cost Engine Preconfigured Option Selection](imgs/ECEPreconfiguredOption.png)
 
