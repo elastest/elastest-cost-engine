@@ -67,12 +67,12 @@ public class APIController {
         List<TormTJobsResponse> tjobs = new ArrayList<>();
         EsmServiceCatalogResponse serviceCatalog = new EsmServiceCatalogResponse();
         try {
-            // Get all TJobs
+            // Get all TJobs from TORM
             HTTPResponse response = apiCaller.get(new URL(tormURL));
 //            response.unescape();
             tjobs = response.getAsListOfType(TormTJobsResponse.class);
 
-            // Get all Services
+            // Get all Services from ESM
             response = apiCaller.getXBrokerApiVersion(new URL(esmURL));
             serviceCatalog = (EsmServiceCatalogResponse) response.getAsClass(EsmServiceCatalogResponse.class);
         } catch (Exception e) {
@@ -99,20 +99,6 @@ public class APIController {
         model.addAttribute("costModels", costModels);
         logger.info("Redirecting to the ECE's Cost Estimation Page.");
         return "estimate";
-    }
-
-    @RequestMapping(value = "/estimate", method = RequestMethod.POST)
-    public String estimateTJob(String tJobDefinition, String tJobCostModel, Model model) {
-        Gson gson = new Gson();
-        CostModel costModel = gson.fromJson(tJobCostModel, CostModel.class);
-//        ArrayList<String> components = costModel.getComponents().get(Loader.getSettings().getServicesConstant());
-        ArrayList<String> components = (ArrayList<String>) Arrays.asList(costModel.getComponents().get("Services"));
-        for (String component : components) {
-            //TODO: Query ESM for each service Cost Model
-            // CostModel componentCostModel = esmDirver.getServiceCostModel(component);
-            // estimatePost(tJobDefinition, componentCostModel);
-        }
-        return "";
     }
 
     @RequestMapping(value = "/deletecostmodel", method = RequestMethod.GET)
@@ -202,7 +188,6 @@ public class APIController {
         if (costModelType.equalsIgnoreCase("ONDEMAND")) {
             Map<String, Double> fixCost = costModel.getFix_cost();
             Map<String, Double> varRate = costModel.getVar_rate();
-            Map<String, String[]> components = costModel.getComponents();
             Map<String, String> metadata = tJob.getMetadata();
 
             logger.info("Adding all fix costs from the cost model.");
@@ -229,7 +214,7 @@ public class APIController {
     }
 
     @RequestMapping(value = "/tJobEstimation", method = RequestMethod.POST)
-    public String getTJobEstimation(@RequestParam("tJobId") String tJobId, Model model) {
+    public String getTJobEstimation(@RequestParam("tJobId") String tJobId, @RequestParam(value = "minutes", required = false) Integer minutes, Model model) {
         APICaller apiCaller = new APICaller();
         String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint() + "/" + tJobId;
         TormTJobsResponse tJob;
@@ -273,8 +258,13 @@ public class APIController {
 
             // Creating different estimation ranges depending on config file
             HashMap<String, LinkedHashMap<String, Double>> estimations = new HashMap<>();
-            LinkedList<Map<String,Double>> estimationList = new LinkedList<>();
-            List<Integer> estimationRanges = Loader.getSettings().getEstimationSettings().getEstimationRange();
+            LinkedList<Map<String, Double>> estimationList = new LinkedList<>();
+            List<Integer> estimationRanges = new ArrayList<>();
+
+            if (minutes != null)
+                estimationRanges.add(minutes);
+            else
+                estimationRanges = Loader.getSettings().getEstimationSettings().getEstimationRange();
 
             // Creating estimations
             for (Integer range : estimationRanges) {
@@ -290,7 +280,7 @@ public class APIController {
                         String key = (String) itFix.next();
                         Double value = fix.get(key);
                         // Check if the field is already present
-                        if(costReport.containsKey(key))
+                        if (costReport.containsKey(key))
                             value = value + costReport.get(key);
                         costReport.put(key, value);
                         price = price + value;
@@ -302,7 +292,7 @@ public class APIController {
                         String key = (String) varFix.next();
                         Double value = var.get(key) * range;
                         // Check if the field is already present
-                        if(costReport.containsKey(key))
+                        if (costReport.containsKey(key))
                             value = value + costReport.get(key);
                         costReport.put(key, value);
                         price = price + value;
