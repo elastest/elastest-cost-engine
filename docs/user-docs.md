@@ -19,6 +19,8 @@ The landing page of ECE allows to select between the standard (preconfigured) ti
 
 ![ElasTest Cost Engine Landing Page](imgs/ECELanding.png)
 
+## Preconfigured Time based estimation
+
 All the estimations are done based on which services are used in the TJob and their own cost definitions.
 
 By selecting the TJobs on the first menu, the estimations will be based on the ammount of minutes defined in the [configuration file](https://github.com/elastest/elastest-cost-engine/blob/master/conf/ece.conf).
@@ -27,7 +29,11 @@ By selecting the TJobs on the first menu, the estimations will be based on the a
 
 ![ElasTest Cost Engine Preconfigured Estimations Page](imgs/ECEPreconfiguredEstimations.png)
 
+
+## Specific Time based estimation
+
 If you want to base the estimation on a time window that is not predefined in the configuration file, simply add the ammount of minutes to the second menu "Minutes" field and estimate it.  
+
 ![ElasTest Cost Engine Time Option Selection](imgs/ECETimeOption.png)
 
 ![ElasTest Cost Engine Time Based Estimations Page](imgs/ECETimeEstimations.png)
