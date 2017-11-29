@@ -130,7 +130,7 @@ public class APIControllerTest extends TestCase {
         setup();
         apiController = new APIController();
 
-        assertEquals("index", apiController.getIndex(new ExtendedModelMap()));
+        assertEquals("tJobSelection", apiController.getIndex(new ExtendedModelMap()));
     }
 
     @Test
