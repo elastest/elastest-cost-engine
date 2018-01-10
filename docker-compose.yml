@@ -14,10 +14,11 @@ services:
     ports:
       - 8888:8888
     environment:
-      - ELASTESTTORMAPI=http://localhost:37006
-      - ELASTESTESMAPI=http://localhost:37005
+      - ELASTESTTORMAPI=http://160.85.140.240:37006
+      - ELASTESTESMAPI=http://160.85.140.240:37005
       - ELASTESTTORMTJOBENDPOINT=/api/tjob
       - ELASTESTESMCATALOGENDPOINT=/v2/catalog
       - ELASTESTESMINSTANCEENDPOINT=/v2/et/service_instances/
       - HIBERNATEURL=jdbc:postgresql://postgres/ece
       - ESTIMATIONRANGE=1,4,20,60
+
