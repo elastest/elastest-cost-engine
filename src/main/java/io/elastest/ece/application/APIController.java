@@ -50,6 +50,7 @@ public class APIController {
     @PostConstruct
     public void init() {
         //TODO: Communicate with TORM to get all the TJobs
+        //TODO: remove, legacy code for testing
         testCostModelValues();
         testTestValues();
     }
@@ -89,6 +90,7 @@ public class APIController {
 
     @RequestMapping(value = "/estimate", method = RequestMethod.GET)
     public String getEstimateCostModels(Model model) {
+        //TODO: remove, legacy code
         logger.info("Creating test values.");
         HibernateClient hibernateClient = HibernateClient.getInstance();
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
@@ -103,6 +105,7 @@ public class APIController {
 
     @RequestMapping(value = "/deletecostmodel", method = RequestMethod.GET)
     public String getDeleteCostModel(Model model) {
+        //TODO: remove, legacy code
         logger.info("Creating test values.");
         HibernateClient hibernateClient = HibernateClient.getInstance();
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
@@ -115,6 +118,7 @@ public class APIController {
 
     @RequestMapping(value = "/costmodeldetails", method = RequestMethod.GET)
     public String getCostModelDetails(Model model) {
+        //TODO: remove, legacy code
         logger.info("Creating test values.");
         HibernateClient hibernateClient = HibernateClient.getInstance();
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
@@ -127,6 +131,7 @@ public class APIController {
 
     @RequestMapping(value = "/createcostmodel", method = RequestMethod.GET)
     public String getCreateCostModel() {
+        //TODO: remove, legacy code
         logger.info("Redirecting to the ECE's Cost Model Creation Page.");
         return "createcostmodel";
     }
@@ -134,6 +139,7 @@ public class APIController {
     @RequestMapping(value = "/costmodel", method = RequestMethod.POST)
     public String addCostModel(@RequestParam String name, @RequestParam String description, @RequestParam String[] fixNames, @RequestParam Double[] fixValues, @RequestParam String[] varNames, @RequestParam Double[] varValues, Model model) {
         logger.info("Creating Cost Model.");
+        //TODO: remove, legacy code
         HashMap<String, Double> varCosts = new HashMap<>();
         HashMap<String, Double> fixCosts = new HashMap<>();
 
@@ -155,6 +161,7 @@ public class APIController {
 
     @RequestMapping(value = "/costmodel", method = RequestMethod.GET)
     public String getCostModel(@RequestParam String costModelId, Model model) {
+        //TODO: remove, legacy code
         logger.info("Returning information about the cost model: " + costModelId);
         HibernateClient hibernateClient = HibernateClient.getInstance();
         CostModel costModel = (CostModel) hibernateClient.getObject(CostModel.class, Long.valueOf(costModelId));
@@ -165,6 +172,7 @@ public class APIController {
 
     @RequestMapping(value = "/deleteCostModel", method = RequestMethod.POST)
     public String deleteCostModel(@RequestParam String costModelId) {
+        //TODO: remove, legacy code
         logger.info("Deleting the Cost Model: " + costModelId);
         HibernateClient hibernateClient = HibernateClient.getInstance();
         CostModel costModel = (CostModel) hibernateClient.getObject(CostModel.class, Long.valueOf(costModelId));
@@ -175,11 +183,13 @@ public class APIController {
 
     @RequestMapping(value = "/estimation", method = RequestMethod.GET)
     public String getEstimate(@RequestParam("tJobId") String tJobId, @RequestParam("costModelId") String costModelId, Model model) {
+        //TODO: remove, legacy code
         return estimatePost(tJobId, costModelId, model);
     }
 
     @RequestMapping(value = "/estimation", method = RequestMethod.POST)
     public String estimatePost(@RequestParam String testId, @RequestParam String costModelId, Model model) {
+        //TODO: remove, legacy code
         HibernateClient hibernateClient = HibernateClient.getInstance();
         CostModel costModel = (CostModel) hibernateClient.getObject(CostModel.class, Long.valueOf(costModelId));
         TJob tJob = (TJob) hibernateClient.getObject(TJob.class, Long.valueOf(testId));
