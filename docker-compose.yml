@@ -10,15 +10,12 @@ services:
       - POSTGRES_PASSWORD=elastestpassword
       - POSTGRES_DB=ece
   ece:
-    image: elastest/ece:0.5.0
+    image: elastest/ece:latest
     ports:
       - 8888:8888
     environment:
       - ET_ETM_API=http://etm:37006/
       - ET_ESM_API=http://esm:37005/
-      - ELASTESTTORMTJOBENDPOINT=api/tjob
-      - ELASTESTESMCATALOGENDPOINT=v2/catalog
-      - ELASTESTESMINSTANCEENDPOINT=v2/et/service_instances/
       - HIBERNATEURL=jdbc:postgresql://postgres/ece
       - ESTIMATIONRANGE=1,4,20,60
 
