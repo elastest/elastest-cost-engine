@@ -1,0 +1,20 @@
+"costs": {
+            "components": {},
+            "description": "cost model for ems support service",
+            "currency": "EUR",
+            "methodology": "duration",
+            "model": "PAYG",
+            "model_param": {},
+            "fix_cost": {
+                "setup_cost": 5
+            },
+            "name": "ems-model-A",
+            "var_rate": {
+              "cpu": 50,
+              "cpu_unit": "core-hour",
+              "disk": 1,
+              "disk_unit": "gb-hour",
+              "memory": 10,
+              "memory_unit": "gb-hour"
+            }
+          }
