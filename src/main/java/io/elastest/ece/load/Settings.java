@@ -163,13 +163,13 @@ public class Settings {
         ElasTestSettings elasTestSettings = new ElasTestSettings();
         Map<String, String> env = System.getenv();
 
-        if (env.containsKey("ELASTESTTORMAPI"))
-            elasTestSettings.setElasTestTormAPI(env.get("ELASTESTTORMAPI"));
+        if (env.containsKey("ET_ETM_API"))
+            elasTestSettings.setElasTestTormAPI(env.get("ET_ETM_API"));
         else
             elasTestSettings.setElasTestTormAPI((String) properties.get("ElasTestTormAPI"));
 
-        if (env.containsKey("ELASTESTESMAPI"))
-            elasTestSettings.setElasTestESMAPI(env.get("ELASTESTESMAPI"));
+        if (env.containsKey("ET_ESM_API"))
+            elasTestSettings.setElasTestESMAPI(env.get("ET_ESM_API"));
         else
             elasTestSettings.setElasTestESMAPI((String) properties.get("ElasTestESMAPI"));
 
