@@ -62,8 +62,10 @@ public class APIController {
         List<CostModel> costModels = hibernateClient.executeQuery(QueryHelper.createListQuery(CostModel.class));
         List<TJob> tJobs = hibernateClient.executeQuery(QueryHelper.createListQuery(TJob.class));
 
-        String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint();
-        String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + Loader.getSettings().getElastestSettings().getElasTestESMCatalogEndpoint();
+        //String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint();
+        String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + "api/tjob";
+        //String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + Loader.getSettings().getElastestSettings().getElasTestESMCatalogEndpoint();
+        String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + "v2/catalog";
         APICaller apiCaller = new APICaller();
         List<TormTJobsResponse> tjobs = new ArrayList<>();
         EsmServiceCatalogResponse serviceCatalog = new EsmServiceCatalogResponse();
@@ -226,7 +228,8 @@ public class APIController {
     @RequestMapping(value = "/tJobEstimation", method = RequestMethod.POST)
     public String getTJobEstimation(@RequestParam("tJobId") String tJobId, @RequestParam(value = "minutes", required = false) Integer minutes, Model model) {
         APICaller apiCaller = new APICaller();
-        String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint() + "/" + tJobId;
+        //String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + Loader.getSettings().getElastestSettings().getElasTestTormTJobEndpoint() + "/" + tJobId;
+        String tormURL = Loader.getSettings().getElastestSettings().getElasTestTormAPI() + "api/tjob" + "/" + tJobId;
         TormTJobsResponse tJob;
         try {
             // Try to get the TJob with the selected Id from TORM
@@ -245,7 +248,8 @@ public class APIController {
                 for (EsmServiceStringObject service : esmServices) {
                     if (service.getSelected()) {
                         // Get the Service Type from the catalog
-                        String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + Loader.getSettings().getElastestSettings().getElasTestESMCatalogEndpoint();//getElasTestESMInstanceEndpoint() + service.getId();
+                        //String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + Loader.getSettings().getElastestSettings().getElasTestESMCatalogEndpoint();//getElasTestESMInstanceEndpoint() + service.getId();
+                        String esmURL = Loader.getSettings().getElastestSettings().getElasTestESMAPI() + "v2/catalog";//getElasTestESMInstanceEndpoint() +
                         response = apiCaller.getXBrokerApiVersion(new URL(esmURL));
                         EsmServiceCatalogResponse esmServiceCatalogResponse = (EsmServiceCatalogResponse) response.getAsClass(EsmServiceCatalogResponse.class);
                         for (EsmService serviceType : esmServiceCatalogResponse.getServices()) {
