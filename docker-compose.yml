@@ -8,4 +8,3 @@ services:
     environment:
       - ET_ETM_API=http://nightly.elastest.io:37006/
       - ET_ESM_API=http://nightly.elastest.io:37005/
-
