@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  ece:
+    image: elastest/ece:latest
+    ports:
+      - 8888:8888
+    environment:
+      - ET_ETM_API=http://nightly.elastest.io:37006/
+      - ET_ESM_API=http://nightly.elastest.io:37005/
+
