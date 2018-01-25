@@ -9,7 +9,7 @@ node('docker') {
             stage "Tests"
                 echo ("Starting tests")
                 sh 'mvn clean test'
-                step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
+                //step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
 
             stage "Package"
                 echo ("Packaging")
