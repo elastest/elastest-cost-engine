@@ -4,7 +4,8 @@ node('docker')
         echo("The node is up")
         def mycontainer = docker.image('elastest/ci-docker-siblings:latest')
         mycontainer.pull()
-        mycontainer.inside("-u jenkins -v /var/run/docker.sock:/var/run/docker.sock:rw") {
+        mycontainer.inside("-u jenkins -v /var/run/docker.sock:/var/run/docker.sock:rw") 
+	{
             git 'https://github.com/elastest/elastest-cost-engine.git'
 
             stage "Tests"
@@ -30,7 +31,8 @@ node('docker')
                 echo ("Publishing")
 
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'elastestci-dockerhub',
-                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) 
+		{
                     sh 'docker login -u "$USERNAME" -p "$PASSWORD"'
                     myimage.push()
                 }
