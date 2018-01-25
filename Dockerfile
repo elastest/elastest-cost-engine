@@ -1,4 +1,4 @@
-from frolvlad/alpine-oraclejdk8:8.161.12-slim
+FROM frolvlad/alpine-oraclejdk8:8.161.12-slim
 LABEL maintainer="elastest-users@googlegroups.com"
 LABEL version="0.5.0"
 LABEL description="Builds the ece docker image."
