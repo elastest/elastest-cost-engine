@@ -70,6 +70,7 @@ public class Controller {
             catch(IOException ioex)
             {
                 ioex.printStackTrace();
+                logger.warn("Error in parsing TORM response: " + ioex.getMessage() + ":" + ioex.getLocalizedMessage());
             }
         }
         else
@@ -88,8 +89,17 @@ public class Controller {
         logger.info("Support services list for TJob " + tjobName + ": " + tjobServices);
         logger.info("Static analysis request received: job-id:" + tjobId + " job-name:" + tjobName + " services-string: " + tjobServices);
         Gson gson = new Gson();
-        TJobService[] services = gson.fromJson(tjobServices, TJobService[].class);
-        logger.info("Starting analysis, services list count: " + services.length);
+        TJobService[] services;
+        try
+        {
+            services = gson.fromJson(tjobServices, TJobService[].class);
+            logger.info("Starting analysis, services list count: " + services.length);
+        }
+        catch (Exception ex)
+        {
+            logger.warn("Error in parsing support service string received from TORM: " + ex.getMessage() + ":" + ex.getLocalizedMessage());
+            throw ex; //to show the error message
+        }
 
         //getting the service catalog
         HashMap<String, String> headers = new HashMap<>();
@@ -132,13 +142,13 @@ public class Controller {
                                     {
                                         String keyName = new String((String) key);
                                         Double keyRate = new Double((double)fixCost.get(key));
-                                        logger.info(keyName + ":" + keyRate);
+                                        logger.info("Fix cost element: " + keyName + ":" + keyRate);
                                     }
                                     for(Object key: varRate.keySet().toArray())
                                     {
                                         String keyName = new String((String) key);
                                         Double keyRate = new Double((double)varRate.get(key));
-                                        logger.info(keyName + ":" + keyRate);
+                                        logger.info("Var rate element: " + keyName + ":" + keyRate);
                                     }
                                     double incrementalCost = ((double)varRate.get("disk") + (double)varRate.get("memory") + (double)varRate.get("cpus")) / 60.0;
                                     Object[][] piedata = new Object[5][2];
@@ -179,6 +189,12 @@ public class Controller {
             catch(IOException ioex)
             {
                 ioex.printStackTrace();
+                logger.warn("Error in parsing ESM catalog details: " + ioex.getMessage() + ":" + ioex.getLocalizedMessage());
+            }
+            catch(Exception ex)
+            {
+                logger.warn("Unhandled exception is processing catalog data: " + ex.getMessage() + ":" + ex.getLocalizedMessage());
+                throw ex;
             }
 
         }

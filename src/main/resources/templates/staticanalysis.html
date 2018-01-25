@@ -116,7 +116,7 @@
                 </script>
 
                 <hr>
-                <div class="alert alert-info">
+                <div class="alert alert-info" th:unless="${costbreakup.empty}">
                     <img src="assets/info.png" width="28px" align="left">
                     The static analysis was carried out with these assumptions: the model defines cost for each resource in price/*-hr basis.
                     Additionally, the cost unit is assumed to be Euro.
