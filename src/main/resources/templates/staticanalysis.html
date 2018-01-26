@@ -48,12 +48,12 @@
 
                 <div class="row" th:each="costpart : ${costbreakup}" style="margin-bottom:10px;min-height: 200px">
                     <div class="col col-sm-3" style="background-color: antiquewhite">
-                        <span class="h4">ElasTest support service details</span><br><br>
+                        <span class="h4">Service plan details</span><br><br>
                         <span style="font-family:Helvetica;font-size:12px">PlanID:</span>
                         <span style="font-family:Helvetica;font-size:12px" th:text="${costpart.planId}"></span><br>
-                        <span style="font-family:Helvetica;font-size:12px">ServiceName:</span>
+                        <span style="font-family:Helvetica;font-size:12px">Name:</span>
                         <span style="font-family:Helvetica;font-size:12px" th:text="${costpart.serviceName}"></span><br>
-                        <span style="font-family:Helvetica;font-size:12px">Plan description:</span>
+                        <span style="font-family:Helvetica;font-size:12px">Description:</span>
                         <span style="font-family:Helvetica;font-size:12px" th:text="${costpart.description}"></span><br>
                     </div>
                     <div class="col col-sm-6" th:id="${costpart.planId}"></div>
