@@ -33,7 +33,7 @@
 </head>
 <body>
     <div class="container-fluid">
-        <div class="row" style="background-color: aliceblue">
+        <div class="row" style="background-color: white">
             <div class="col">
                 <h1 class="display-4">Choose a TJob from the list to analyze.</h1>
                 <table class="table table-hover table-sm">
@@ -54,13 +54,13 @@
                                     <input type="hidden" name="tjobservices" th:value="${tjob.esmServicesString}">
                                     <input type="hidden" name="tjobname" th:value="${tjob.name}">
                                     <input type="hidden" name="tjobid" th:value="${tjob.id}">
-                                    <button type="submit" class="btn btn-primary btn-raised">Analyze</button>
+                                    <button type="submit" class="btn btn-primary btn-raised" style="background-color: #ffac2f">Analyze</button>
                                 </form>
                                 <form style="display: inline; margin: 0;" method="post" action="/dynamicanalysis">
                                     <input type="hidden" name="tjobservices" th:value="${tjob.esmServicesString}">
                                     <input type="hidden" name="tjobname" th:value="${tjob.name}">
                                     <input type="hidden" name="tjobid" th:value="${tjob.id}">
-                                    <button type="submit" class="btn btn-primary btn-raised" disabled>True cost</button>
+                                    <button type="submit" class="btn btn-primary btn-raised" style="background-color: #ffac2f" disabled>True cost</button>
                                 </form>
                             </td>
                         </tr>
@@ -71,6 +71,7 @@
             <div class="col-md-auto" style="background-color: antiquewhite; max-width: 350px">
                 <h3>Useful guidelines</h3>
                 <hr>
+                <!--
                 <h4>Model specification</h4>
                 For cost estimation to work properly, every service must speficy their cost model when registering with the service manager. A sample entry for a cost model is shown below.
                 <br><br>
@@ -96,10 +97,14 @@
     }
 }
                 </pre>
+                -->
                 <h4>Steps to follow</h4>
                 <ul>
                     <li>decide on a TJob from the list</li>
                     <li>press Analyze next to the job to perform static analysis</li>
+                    <ul>
+                        <li>shows cost implication from each support service used over a 2 hr time window</li>
+                    </ul>
                     <li>once the TJob execution has finished, press True cost to get the actual cost of execution.</li>
                 </ul>
             </div>

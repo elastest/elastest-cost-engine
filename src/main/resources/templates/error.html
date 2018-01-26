@@ -34,20 +34,21 @@
 
 <body>
     <div class="container-fluid">
-        <div class="row" style="background-color: aliceblue">
+        <div class="row" style="background-color: white">
             <div class="col">
                 <table>
                     <tr>
                         <td style="width:793px;height:419px;background-image:url('assets/404-art.png')"></td>
                     </tr>
                     <tr>
-                        <button type="submit" onclick="window.history.back();" class="btn btn-primary btn-raised">Go back</button>
+                        <button type="submit" onclick="window.history.back();" class="btn btn-primary btn-raised" style="background-color:#ffac2f">Go back</button>
                     </tr>
                 </table>
             </div>
-            <div class="col-md-auto" style="background-color: antiquewhite; max-width: 350px">
+            <div class="col-md-auto" style="background-color:antiquewhite;; max-width: 350px">
                 <h3>Useful guidelines</h3>
                 <hr>
+                <!--
                 <h4>Model specification</h4>
                 For cost estimation to work properly, every service must speficy their cost model when registering with the service manager. A sample entry for a cost model is shown below.
                 <br><br>
@@ -73,10 +74,14 @@
     }
 }
                 </pre>
+                -->
                 <h4>Steps to follow</h4>
                 <ul>
                     <li>decide on a TJob from the list</li>
                     <li>press Analyze next to the job to perform static analysis</li>
+                    <ul>
+                        <li>shows cost implication from each support service used over a 2 hr time window</li>
+                    </ul>
                     <li>once the TJob execution has finished, press True cost to get the actual cost of execution.</li>
                 </ul>
             </div>
