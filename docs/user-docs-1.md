@@ -7,3 +7,5 @@ Currently, ECE performs only static analysis based on the cost model defined by 
 
 ## Invoking ECE
 ![Navigate to Test Engines page](imgs/ece-access.png)
+In the ElasTest dashboard, navigate to *Test Engines* page from the sidebar. In the list, against *ece*, under **options** click on the **play icon**. If everything starts successfully, after a few seconds you should see **started** status change to *true*, and the **play icon** change to **view icon** as shown below.
+![Once ECE has successfully started](imgs/ece-access-2.png)
