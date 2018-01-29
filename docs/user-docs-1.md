@@ -25,6 +25,17 @@ Currently, ECE performs only static analysis based on the cost model defined by 
 
 ## Interpreting the results
 There are three possibilities once you press the **Analyze** button next to a TJob.
-- If the TJob is using support services, you will see the detailed cost analysis results per support service (see sample figure below)
+
+### When support services are defined in TJob
+If the TJob is using support services, you will see the detailed cost analysis results per support service (see sample figures below)
 
 ![ECE analysis page](imgs/ece-analysis-1.png)
+![ECE analysis page](imgs/ece-analysis-2.png)
+
+### When no support services are defined in TJob
+
+![ECE analysis page](imgs/ece-analysis-3.png)
+
+### When exception is raised due to incomplete data from TORM
+
+![ECE analysis page](imgs/ece-analysis-4.png)
