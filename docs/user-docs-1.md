@@ -30,7 +30,15 @@ There are three possibilities once you press the **Analyze** button next to a TJ
 If the TJob is using support services, you will see the detailed cost analysis results per support service (see sample figures below)
 
 ![ECE analysis page](imgs/ece-analysis-1.png)
+
+The analysis shows cost implication of each service. In case multiple support services are used in a TJob, they are analyzed individually.
+
 ![ECE analysis page, multiple support services](imgs/ece-analysis-2.png)
+
+The analysis data has the following components -
+- service plan details
+- cost vs time chart showing amount of money needed to execute the test over a period of 2 hours
+- cost model parameters of the support service being analyzed.
 
 ### When no support services are defined in TJob
 A warning message is displayed when you try to perform static cost analysis of a TJob that uses no support services. The image below shows how the response looks like.
