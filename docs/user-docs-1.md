@@ -15,3 +15,8 @@ Currently, ECE performs only static analysis based on the cost model defined by 
 - Click on the **view icon** to access ECE UI
 
 ## Using ECE
+- ECE presents a list of all registered TJobs (see figure below)
+  - Each entry has two buttons next to it:
+    - Analyze (for static cost analysis)
+    - True Cost (for real time dynamic cost computation), this is disabled currently.
+![ECE main page](imgs/ece-access-3.png)
