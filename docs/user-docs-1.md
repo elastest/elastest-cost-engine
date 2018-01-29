@@ -22,3 +22,9 @@ Currently, ECE performs only static analysis based on the cost model defined by 
 
 ![ECE main page](imgs/ece-access-3.png)
   - choose the TJob that you are interested in analyzing statically by pressing the **analyze** button next to it.
+
+## Interpreting the results
+There are three possibilities once you press the **Analyze** button next to a TJob.
+- If the TJob is using support services, you will see the detailed cost analysis results per support service (see sample figure below)
+
+![ECE analysis page](imgs/ece-analysis-1.png)
