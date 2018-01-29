@@ -1,0 +1,9 @@
+# ElasTest Cost Engine (ECE): User Guide
+
+## Introduction
+ECE is integrated with the ElasTest dashboard and allows intuitive access to testers for seeing the financial implications of executing distributed tests using cloud resources together with other support services.
+
+Currently, ECE performs only static analysis based on the cost model defined by support service providers as part of a plan. In future releases, dynamic analysis capability will be added that will show the true cost of executing tests on real compute resources.
+
+## Invoking ECE
+![Navigate to Test Engines page](imgs/ece-access.png)
