@@ -1,39 +1,51 @@
-# ElasTest Cost Engine (ECE)
+# ElasTest Cost Engine (ECE): User Guide
 
-The Cost, Energy and Resource Consumption Modeling Engines (ECE) will be used in order to make ElasTest consider the financial of using clouds. Using clouds cost money, in third party clouds you pay for the time and resources you use. As well as in on-premises clouds, you pay for the energy and the hardware resources utilization. If ElasTest does not consider this aspects, the risk of not being financially sustainable appears.
+## Introduction
+ECE is integrated with the ElasTest dashboard and allows intuitive access to testers for seeing the financial implications of executing distributed tests using cloud resources together with other support services.
 
-The ECE is a service that needs information from the ElasTest Service Manager (ESM) and the ElasTest Platform Manager (EPM) for pulling information about the Platforms and Services Cost Models, and also needs information from the ElasTest Test Orchestration and Recommendation Manager (TORM) in order to know what T-Jobs can the ElasTest user estimate.
+Currently, ECE performs only static analysis based on the cost model defined by support service providers as part of a plan. In future releases, dynamic analysis capability will be added that will show the true cost of executing tests on real compute resources.
 
-# Features
+## Invoking ECE
+![Navigate to Test Engines page](imgs/ece-access.png)
+- In the ElasTest dashboard, navigate to *Test Engines* page from the sidebar. 
+- In the list, against *ece*, under **options** click on the **play icon**. 
+  - If everything starts successfully, after a few seconds you should see **started** status change to *true*, and the **play icon** change to **view icon** as shown below.
 
-The ElasTest Cost Engine provides a friendly user interface that allows you to estimate the cost of running the existing Test Jobs on the [TORM](https://github.com/elastest/elastest-torm) and the ElasTest services used in the tests.
+![Once ECE has successfully started](imgs/ece-access-2.png)
+- Click on the **view icon** to access ECE UI
 
-This version of the ECE provides:
+## Using ECE
+- ECE presents a list of all registered TJobs (see figure below)
+  - Each entry has two buttons next to it:
+    - Analyze (for static cost analysis)
+    - True Cost (for real time dynamic cost computation), this is disabled currently.
 
-- Estimation based on different time windows (Defaulted by when installed).
-- Estimation based on a specified time window.   
+![ECE main page](imgs/ece-access-3.png)
+  - choose the TJob that you are interested in analyzing statically by pressing the **analyze** button next to it.
 
-# How to use ECE
+## Interpreting the results
+There are three possibilities once you press the **Analyze** button next to a TJob.
 
-The landing page of ECE allows to select between the standard (preconfigured) time windows estimation as well as the estimation with a time window defined by yourself. 
+### When support services are defined in TJob
+If the TJob is using support services, you will see the detailed cost analysis results per support service (see sample figures below)
 
-![ElasTest Cost Engine Landing Page](imgs/ECELanding.png)
+![ECE analysis page](imgs/ece-analysis-1.png)
 
-## Preconfigured Time based estimation
+The analysis shows cost implication of each service. In case multiple support services are used in a TJob, they are analyzed individually.
 
-All the estimations are done based on which services are used in the TJob and their own cost definitions.
+![ECE analysis page, multiple support services](imgs/ece-analysis-2.png)
 
-By selecting the TJobs on the first menu, the estimations will be based on the ammount of minutes defined in the [configuration file](https://github.com/elastest/elastest-cost-engine/blob/master/conf/ece.conf) and/or as an environment variable on the [docker-compose](https://github.com/elastest/elastest-cost-engine/blob/master/docker-compose.yml) file.
+The analysis data has the following components -
+- service plan details
+- cost vs time chart showing amount of money needed to execute the test over a period of 2 hours
+- cost model parameters of the support service being analyzed.
 
-![ElasTest Cost Engine Preconfigured Option Selection](imgs/ECEPreconfiguredOption.png)
+### When no support services are defined in TJob
+A warning message is displayed when you try to perform static cost analysis of a TJob that uses no support services. The image below shows how the response looks like.
 
-![ElasTest Cost Engine Preconfigured Estimations Page](imgs/ECEPreconfiguredEstimations.png)
+![ECE analysis page](imgs/ece-analysis-3.png)
 
+### When exception is raised due to incomplete data from TORM
+As error message is displayed when you try to perform static cost analysis of a TJob that is incorrectly configured in TORM and is missing critical data parameters needed by ECE to function properly. The image below shows how the response looks like.
 
-## Specific Time based estimation
-
-If you want to base the estimation on a time window that is not predefined in the configuration file, simply add the ammount of minutes to the second menu "Minutes" field and estimate it.  
-
-![ElasTest Cost Engine Time Option Selection](imgs/ECETimeOption.png)
-
-![ElasTest Cost Engine Time Based Estimations Page](imgs/ECETimeEstimations.png)
+![ECE analysis page](imgs/ece-analysis-4.png)
