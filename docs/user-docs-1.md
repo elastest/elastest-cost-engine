@@ -30,12 +30,14 @@ There are three possibilities once you press the **Analyze** button next to a TJ
 If the TJob is using support services, you will see the detailed cost analysis results per support service (see sample figures below)
 
 ![ECE analysis page](imgs/ece-analysis-1.png)
-![ECE analysis page](imgs/ece-analysis-2.png)
+![ECE analysis page, multiple support services](imgs/ece-analysis-2.png)
 
 ### When no support services are defined in TJob
+A warning message is displayed when you try to perform static cost analysis of a TJob that uses no support services. The image below shows how the response looks like.
 
 ![ECE analysis page](imgs/ece-analysis-3.png)
 
 ### When exception is raised due to incomplete data from TORM
+As error message is displayed when you try to perform static cost analysis of a TJob that is incorrectly configured in TORM and is missing critical data parameters needed by ECE to function properly. The image below shows how the response looks like.
 
 ![ECE analysis page](imgs/ece-analysis-4.png)
