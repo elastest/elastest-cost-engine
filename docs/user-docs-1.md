@@ -19,4 +19,5 @@ Currently, ECE performs only static analysis based on the cost model defined by 
   - Each entry has two buttons next to it:
     - Analyze (for static cost analysis)
     - True Cost (for real time dynamic cost computation), this is disabled currently.
+
 ![ECE main page](imgs/ece-access-3.png)
