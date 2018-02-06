@@ -10,15 +10,15 @@ node('docker')
 
             stage "Tests"
                 echo ("Starting tests")
-                sh 'mvn clean test'
+                sh 'cd ece; mvn clean test'
                 //step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
 
             stage "Package"
                 echo ("Packaging")
-                sh 'mvn package -DskipTests'
+                sh 'cd ece; mvn package -DskipTests'
 
             stage "Archive artifacts"
-                archiveArtifacts artifacts: 'target/*.jar'
+                archiveArtifacts artifacts: 'ece/target/*.jar'
 
             stage "Build image - Package"
                 echo ("Building ECE Image")
