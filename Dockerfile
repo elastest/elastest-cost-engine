@@ -5,7 +5,7 @@ LABEL description="Builds the ece docker image."
 
 EXPOSE 8888
 COPY ece/target/cost-engine-0.1.0.jar /ece.jar
-COPY application.properties /application.properties
+COPY ece/application.properties /application.properties
 ADD start.sh start.sh
 RUN chmod +x start.sh
 CMD ["/bin/ash", "start.sh"]
