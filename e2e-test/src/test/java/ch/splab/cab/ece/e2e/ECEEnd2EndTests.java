@@ -30,66 +30,109 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.net.URL;
+import java.util.NoSuchElementException;
+import java.util.concurrent.TimeoutException;
+
+import static java.lang.System.getProperty;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ECEEnd2EndTests
 {
     private static final Logger logger = LogManager.getLogger("ECEEnd2EndTests");
+    String tormURL = "http://localhost:37000";
+    private boolean hasECEStarted = false;
 
-    String tormURL = "http://nightly.elastest.io:37000";
     WebDriver driver;
 
     @Before
     public void setup()
     {
-        System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/src/test/resources/chromedriver");
-        driver = new ChromeDriver();
-        logger.info("Opening TORM at "  + tormURL);
+        String osName = System.getProperty("os.name").toLowerCase();
+        boolean isMacOs = osName.startsWith("mac os x");
+        if(isMacOs)
+            System.setProperty("webdriver.chrome.driver", getProperty("user.dir") + "/src/test/resources/chromedrivermac");
+        else
+            System.setProperty("webdriver.chrome.driver", getProperty("user.dir") + "/src/test/resources/chromedriver");
 
-        driver.get(tormURL);
         try
         {
-            logger.info("Page title: " + driver.getTitle());
-            logger.info("Clicking side menu link");
-            driver.findElement(By.id("nav_test_engines")).click();
+            String etmUrl = getProperty("etmUrl");
+            tormURL = (etmUrl==null ? "http://localhost:37000" : etmUrl);
+
+            logger.info("Opening TORM at "  + tormURL);
+
+            driver = new ChromeDriver();
+            driver.manage().timeouts().implicitlyWait(30, SECONDS);
+            driver.manage().window().setSize(new Dimension(1400, 1200));
+            driver.get(tormURL);
+            try
+            {
+                logger.info("Page title: " + driver.getTitle());
+                logger.info("Clicking side menu link");
+                driver.findElement(By.id("nav_test_engines")).click();
+            }
+            catch(Exception ex)
+            {
+                logger.info("Unable to find side navigation link. Directly accessing test engines url");
+                driver.get(tormURL + "/#/test-engines");
+            }
+
+            logger.info("Engines Page title: " + driver.getTitle());
+            logger.info("Starting ece engine");
+
+            try
+            {
+                driver.findElement(By.xpath("//span[text()='ece']//following::button[@title='Start Engine']")).click();
+                new WebDriverWait(driver, 60)
+                        .ignoring(StaleElementReferenceException.class)
+                        .until((WebDriver d) -> {
+                            WebElement we = d.findElement(By.xpath("(//button[@title='View Engine'])"));
+                            logger.info(we.getAttribute("title"));
+                            logger.info(we.getTagName());
+                            we.click();
+                            return true;
+                        });
+                hasECEStarted = true;
+                logger.info("Redirected to " + driver.getCurrentUrl() + ". Switching focus to iFrame");
+                driver.switchTo().frame(driver.findElement(By.name("engine")));
+            }
+            catch(Exception ex)
+            {
+                logger.error("ece page took too long to open or was already open, try direct link please.");
+                hasECEStarted = false;
+            }
+
         }
         catch(Exception ex)
         {
-
+            ex.printStackTrace();
         }
-        logger.info("Page title: " + driver.getTitle());
-        logger.info("Starting ece engine");
-        driver.findElement(By.xpath("//span[text()='ece']//following::button[@title='Start Engine']")).click();
-
-        //accessing the ece page directly
-        driver.get(tormURL + "/#/test-engines/ece");
-
-        // need another delay here as the platform does not load instantaneously
-        try
-        {
-            new WebDriverWait(driver, 120)
-                    .ignoring(StaleElementReferenceException.class)
-                    .until((WebDriver d) -> {
-                        WebElement we = d.findElement(By.id("nav_test_engines"));
-                        return true;
-                    });
-        }
-        catch (TimeoutException te)
-        {
-            logger.info("ece page should be loaded by now");
-        }
-
-
-        logger.info("Redirected to " + driver.getCurrentUrl() + ". Switching focus to iFrame");
-        driver.switchTo().frame(driver.findElement(By.name("engine")));
     }
 
     @Test
     public void invokeEce()
     {
         logger.info("Opening New Cost Analysis");
+        if(hasECEStarted)
+        {
+            assertTrue(driver.findElement(By.className("container-fluid")).isDisplayed());
+        }
+        else
+        {
+            logger.info("Directly accessing ece page assuming engine actually started");
+            assertEquals(driver.getCurrentUrl(), tormURL + "/#/test-engines");
+            //driver.navigate().to(tormURL + "/#/test-engines/ece");
+            //assertEquals(driver.getCurrentUrl(), tormURL + "/#/test-engines/ece");
+        }
     }
 
     @After
