@@ -22,7 +22,6 @@
 
 package ch.splab.cab.ece.e2e;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
@@ -30,15 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.net.URL;
-import java.util.NoSuchElementException;
-import java.util.concurrent.TimeoutException;
 
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -144,7 +135,7 @@ public class ECEEnd2EndTests
             driver.switchTo().defaultContent();
             logger.info("Stopping ece");
             driver.findElement(By.id("nav_test_engines")).click();
-            driver.findElement(By.xpath("//button[@title='Stop Engine']")).click();
+            driver.findElement(By.xpath("//span[text()='ece']//following::button[@title='Stop Engine']")).click();
         }
         catch(Exception e)
         {
