@@ -1,51 +1,37 @@
-node('docker') {
+@Library('ciElastestConnect') _
 
-   stage('Preparation') {
-      
-      
+elastest_lib.setVersion('dev')
+//initialization of the context for the library
+elastest_lib.setContext(this)
 
-      def mycontainer = docker.image('elastest/ci-docker-e2e:latest')
-      mycontainer.pull()
-      mycontainer.inside("-u jenkins -v /var/run/docker.sock:/var/run/docker.sock:rw -v /dev/shm:/dev/shm") {
-         sh '/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf &'
-         git 'https://github.com/elastest/elastest-cost-engine.git'
+//initialization of the runnable object to access elastest methods inside the pipeline
+def elastest= elastest_lib.getElastestMethods()
 
-         stage('ElasTest starting'){
-            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock elastest/platform stop" 
-            try {
-               sh "docker rm -f elastest-platform"
-            } catch(e) {
-               echo "Error: $e"
-            }
+elastest_lib.setMode('experimental-lite')
+//definition of nodes is managed by the library. Just declare the steps of your pipeline
+//inside the elastest_lib.pipeline({...})
 
-            sh "docker run --name elastest-platform -d --rm -v /var/run/docker.sock:/var/run/docker.sock elastest/platform:dev start --mode=experimental-lite"
-            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock elastest/platform wait --running=240"
-            sh "docker logs elastest-platform"
-
-            containerId= sh (
-                script: 'cat /proc/self/cgroup | grep "docker" | sed s/\\\\//\\\\n/g | tail -1',
-                returnStdout: true
-            ).trim()
-
-            echo "containerId = ${containerId}"
-            sh "docker network connect elastest_elastest "+ containerId
-	        etmUrl= sh (
-                script: 'docker inspect --format=\\"{{.NetworkSettings.Networks.elastest_elastest.Gateway}}\\" elastest_etm-proxy_1',
-                returnStdout: true
-            ).trim()
-            echo "ETM container IP=${etmUrl}"
-         }
-
-         stage ("E2E tests") {
-            //extra params are sent to java execution
-            try {
-               sh "cd e2e-test; mvn -B clean test -Duser=elastest -DetmUrl=${etmUrl}"
-            } catch(e) {
-                sh 'docker ps | awk "{print $NF}" | grep ece | xargs docker logs'
-            }
-            step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
-         }
-     }
-  }
-}
-
+elastest_lib.pipeline({
+    
+    stage ('docker container')
+        def mycontainer = elastest.ctx.docker.image('elastest/ci-docker-e2e:latest')
+        mycontainer.pull()
+        mycontainer.inside("-u jenkins -v /var/run/docker.sock:/var/run/docker.sock:rw -v /dev/shm:/dev/shm")  {
+            sh '/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf &'
+          
+            stage ('prepare')
+                git 'https://github.com/elastest/elastest-cost-engine.git'
+                elastest.connect2ElastestNetwork()
+                def tormIp = elastest.getIp()
+                
+            stage ("E2E tests")
+                //extra params are sent to java execution
+                try {
+                   sh "cd e2e-test; mvn -B clean test -Duser=elastest -DetmUrl="+tormIp //the full url should be parametrized (including protocol)
+                } catch(e) {
+                    sh 'docker ps | awk "{print $NF}" | grep ece | xargs docker logs'
+                }
+            stage ("results")
+                step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
+        }
+  })
