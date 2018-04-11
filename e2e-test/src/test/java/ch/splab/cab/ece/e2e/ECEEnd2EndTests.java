@@ -57,7 +57,7 @@ public class ECEEnd2EndTests
         try
         {
             String etmUrl = getProperty("etmUrl");
-            tormURL = (etmUrl==null ? "http://localhost:37000" : "http://" + etmUrl + ":37000");
+            tormURL = (etmUrl==null ? "http://localhost:37000" : etmUrl);
 
             logger.info("Opening TORM at "  + tormURL);
 
