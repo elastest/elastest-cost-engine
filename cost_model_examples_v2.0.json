@@ -1,0 +1,120 @@
+{
+  "model_examples": [
+    {
+      "description": "cost model for emp",
+      "currency": "chf",
+      "model": "pay-as-you-go",
+      "model_param": {
+        "setup_cost": 10
+      },
+      "meter_list": [
+        {
+          "meter_name": "space",
+          "meter_type": "counter",
+          "unit_cost": 5,
+          "unit": "space-hour"
+        },
+        {
+          "meter_name": "series",
+          "meter_type": "counter",
+          "unit_cost": 2.5,
+          "unit": "series-hour"
+        },
+        {
+          "meter_name": "inlux_records",
+          "meter_type": "delta",
+          "unit_cost": 0.000125,
+          "unit": "row"
+        }
+      ]
+    },
+    {
+      "description": "cost model for eus",
+      "currency": "eur",
+      "model": "pay-as-you-go",
+      "model_param": {
+        "setup_cost": 3.5
+      },
+      "meter_list": [
+        {
+          "meter_name": "chrome_browser",
+          "meter_type": "counter",
+          "unit_cost": 5,
+          "unit": "instance-hour"
+        },
+        {
+          "meter_name": "firefox_browser",
+          "meter_type": "counter",
+          "unit_cost": 2.5,
+          "unit": "instance-hour"
+        },
+        {
+          "meter_name": "edge_browser",
+          "meter_type": "counter",
+          "unit_cost": 2,
+          "unit": "instance-hour"
+        }
+      ]
+    },
+    {
+      "description": "cost model for epm",
+      "currency": "eur",
+      "model": "pay-as-you-go",
+      "model_param": {
+        "setup_cost": 0
+      },
+      "meter_list": [
+        {
+          "meter_name": "ram",
+          "meter_type": "counter",
+          "unit_cost": 2.5,
+          "unit": "gb-hour"
+        },
+        {
+          "meter_name": "cpu_cycles",
+          "meter_type": "delta",
+          "unit_cost": 0.025,
+          "unit": "giga-ops"
+        },
+        {
+          "meter_name": "disk",
+          "meter_type": "counter",
+          "unit_cost": 1,
+          "unit": "gb-hour"
+        },
+        {
+          "meter_name": "nw_out",
+          "meter_type": "delta",
+          "unit_cost": 0.00125,
+          "unit": "gb"
+        }
+      ]
+    },
+    {
+      "description": "cost model for torm",
+      "currency": "eur",
+      "model": "subscription",
+      "model_param": {
+        "duration": "M",
+        "auto_renew": "Y",
+        "pro_rata": "Y",
+        "natural_invoice": "Y",
+        "setup_cost": 3.5
+      },
+      "meter_list": [
+        {
+          "meter_name": "tjob",
+          "meter_type": "counter",
+          "unit_cost": 1.25,
+          "unit": "test-jobs"
+        },
+        {
+          "meter_name": "log_size",
+          "meter_type": "volume",
+          "unit_cost": 5,
+          "unit": "gb-hour"
+        }
+      ]
+    }
+  ]
+}
