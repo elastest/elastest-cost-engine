@@ -27,9 +27,10 @@ package ch.splab.cab.costengine.model;
 import java.util.HashMap;
 
 public class ECECostModel {
+    public String shortName;
     public String description;
-    public String name;
-    public String type;
-    public HashMap fix_cost;
-    public HashMap var_rate;
+    public String currency;
+    public String model;
+    public HashMap model_param;
+    public HashMap[] meter_list;
 }

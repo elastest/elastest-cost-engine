@@ -26,15 +26,254 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <title>ElasTest Cost Engine</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.0.0-beta.4/dist/css/bootstrap-material-design.min.css"
-          integrity="sha384-R80DC0KVBO4GSTw+wZ5x2zn2pu4POSErBkf8/fSFhPXHxvHJydT0CSgAP2Yo2r4I" crossorigin="anonymous">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+    <!-- Bootstrap Core Css -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <!-- Waves Effect Css -->
+    <link href="assets/plugins/node-waves/waves.css" rel="stylesheet" />
+    <!-- Animation Css -->
+    <link href="assets/plugins/animate-css/animate.css" rel="stylesheet" />
+    <!-- Bootstrap Material Datetime Picker Css -->
+    <link href="assets/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet" />
+    <!-- Wait Me Css -->
+    <link href="assets/plugins/waitme/waitMe.css" rel="stylesheet" />
+    <!-- Bootstrap Select Css -->
+    <link href="assets/plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
+    <!-- Custom Css -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
+    <link href="assets/css/themes/all-themes.css" rel="stylesheet" />
+
+    <style>
+        svg > g > g:last-child { pointer-events: none }
+    </style>
 </head>
 
-<body>
+<body class="theme-orange">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <div class="container-fluid">
-        <div class="row" style="background-color: white">
+
+        <div class="row clearfix">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="card">
+                    <div class="header">
+                        <h2 th:text="'Static Cost Analysis Results for TJob ID: ' + ${tjobid} + ' (' + ${tjobname} + ')'">
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-group" id="accordion_1" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-warning">
+            <div class="panel-heading" role="tab" id="headingOne_5">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion_5" href="#collapseOne_5" aria-expanded="true" aria-controls="collapseOne_5">
+                        Cost models for TJob <span th:text="${tjobname}">job</span>.
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne_5" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne_5">
+                <div class="panel-body">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4" th:each="costmodel : ${servicecostmodellist}">
+                        <div class="card" >
+                            <div class="header">
+                                <h2 th:text="'Cost components for ' + ${costmodel.shortName}"></h2>
+                            </div>
+                            <div class="body">
+                                <!-- Infobox - 2 -->
+                                <div class="info-box bg-lime">
+                                    <div class="icon">
+                                        <i class="material-icons">euro_symbol</i>
+                                    </div>
+                                    <div class="content">
+                                        <div class="text">SETUP COST</div>
+                                        <div class="number" th:text="${costmodel.model_param.get('setup_cost')} + ' ' + ${costmodel.currency}">125</div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="header bg-light-green">
+                                        <h2>
+                                            METER LIST <small>Shows summary of all meters defined by this service.</small>
+                                        </h2>
+                                    </div>
+                                    <div class="body table-responsive">
+                                        <table class="table table-condensed" style="text-align: left">
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Unit</th>
+                                                <th>Cost</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="meter : ${costmodel.meter_list}">
+                                                <td scope="row"><span th:text="${meter.get('meter_name')}">meter</span></td>
+                                                <td><span th:text="${meter.get('meter_type')}"></span></td>
+                                                <td><span th:text="${meter.get('unit')}"></span></td>
+                                                <td><span th:text="${meter.get('unit_cost')} + ' ' + ${costmodel.currency}"></span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <div class="panel panel-warning">
+            <div class="panel-heading" role="tab" id="headingTwo_5">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion_5" href="#collapseTwo_5" aria-expanded="true" aria-controls="collapseTwo_5">
+                        Static cost estimation for TJob <span th:text="${tjobname}">job</span> based on your inputs.
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseTwo_5" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo_5">
+                <div class="panel-body">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <div class="card">
+                            <div class="header">
+                                <h2>
+                                    COST ESTIMATE BREAKUP <small>Estimates breakdown by individual service components.</small>
+                                </h2>
+                            </div>
+                            <div class="info-box bg-lime">
+                                <div class="icon">
+                                    <i class="material-icons">euro_symbol</i>
+                                </div>
+                                <div class="content">
+                                    <div class="text">TOTAL ESTIMATED COST</div>
+                                    <div class="number" th:if="${servicecostmodellist != null}" th:text="${totalcost} + ' ' + ${servicecostmodellist[0].currency}">125</div>
+                                    <div class="number" th:if="${servicecostmodellist == null}" th:text="${totalcost} + ' eur'">125</div>
+                                </div>
+                            </div>
+
+                            <div class="body" id="costbreakup" style="min-height:300px">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <div class="card">
+                            <div class="header">
+                                <h2>
+                                    USAGE VALUES USED <small>These are the resource consumption estimates used in the estimation.</small>
+                                </h2>
+                            </div>
+
+                            <div class="body" id="usagevalues">
+
+                            </div>
+
+                            <div class="body" id="infrausagevalues">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="row clearfix">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <button type="submit" onclick="window.history.back();" class="btn btn-primary btn-raised" style="background-color: #ffac2f">Go back</button>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(
+                    /*[[${piedata}]]*/
+                );
+
+                var options = {
+                    title: 'component wise breakup',
+                    height:300,
+                    legend: {position: 'bottom', maxLines: 2},
+                    pieHole: 0.4,
+                };
+
+                var eleId = 'costbreakup';
+
+                var chart = new google.visualization.PieChart(document.getElementById(eleId));
+                chart.draw(data, options);
+            }
+            /*]]>*/
+        </script>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            google.charts.load('current', {'packages':['bar']});
+            google.charts.setOnLoadCallback(drawChart2);
+
+            function drawChart2() {
+                var data = google.visualization.arrayToDataTable(
+                    /*[[${usagebardata}]]*/
+                );
+
+                var options = {
+                    chart: {
+                        title: 'support service usage values provided',
+                    },
+
+                    bars: 'horizontal'
+                };
+
+                var eleId = 'usagevalues';
+
+                var chart = new google.charts.Bar(document.getElementById(eleId));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+            /*]]>*/
+        </script>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            google.charts.load('current', {'packages':['bar']});
+            google.charts.setOnLoadCallback(drawChart3);
+
+            function drawChart3() {
+                var data = google.visualization.arrayToDataTable(
+                    /*[[${infrausagebardata}]]*/
+                );
+
+                var options = {
+                    chart: {
+                        title: 'infrastructure usage values provided',
+                    },
+
+                    bars: 'horizontal'
+                };
+
+                var eleId = 'infrausagevalues';
+
+                var chart = new google.charts.Bar(document.getElementById(eleId));
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+            /*]]>*/
+        </script>
+
+        <hr>
+
+        <!--
+        <div class="row clearfix">
+
             <div class="col">
                 <span class="display-4">Static cost analysis for TJob: </span>
                 <span class="display-4" th:text="${tjobname}">job</span>
@@ -46,19 +285,6 @@
 
                 <div class="alert alert-danger" th:if="${costbreakup.empty}">No support service defined!</div>
 
-                <div class="row" th:each="costpart : ${costbreakup}" style="margin-bottom:10px;min-height: 200px">
-                    <div class="col col-sm-3" style="background-color: antiquewhite">
-                        <span class="h4">Service plan details</span><br><br>
-                        <span style="font-family:Helvetica;font-size:12px">PlanID:</span>
-                        <span style="font-family:Helvetica;font-size:12px" th:text="${costpart.planId}"></span><br>
-                        <span style="font-family:Helvetica;font-size:12px">Name:</span>
-                        <span style="font-family:Helvetica;font-size:12px" th:text="${costpart.serviceName}"></span><br>
-                        <span style="font-family:Helvetica;font-size:12px">Description:</span>
-                        <span style="font-family:Helvetica;font-size:12px" th:text="${costpart.description}"></span><br>
-                    </div>
-                    <div class="col col-sm-6" th:id="${costpart.planId}"></div>
-                    <div class="col col-sm-3" th:id="${costpart.planId + 'pie'}"></div>
-                </div>
 
                 <script th:each="costpart: ${costbreakup}" th:inline="javascript">
                     /*<![CDATA[*/
@@ -115,58 +341,33 @@
                     /*]]>*/
                 </script>
 
-                <hr>
-                <div class="alert alert-info" th:unless="${costbreakup.empty}" style="background-color: white">
-                    <img src="assets/info.png" width="28px" align="left">
-                    The static analysis was carried out with these assumptions: the model defines cost for each resource in price/*-hr basis.
-                    Additionally, the cost unit is assumed to be Euro.
-                </div>
-                <div class="row">
-                    <button type="submit" onclick="window.history.back();" class="btn btn-primary btn-raised" style="background-color: #ffac2f">Go back</button>
-                </div>
-            </div>
-            <div class="col-md-auto" style="background-color: antiquewhite; max-width: 350px">
-                <h4>Useful guidelines</h4>
-                <hr>
-                <!--
-                <h5>Model specification</h5>
-                For cost estimation to work properly, every service must speficy their cost model when registering with the service manager.
-                A sample entry for a cost model is shown below.
-                <br><br>
-                <pre style="font-family: Courier; font-size: 11px; background-color: honeydew">
-"costs": {
-    "components": {},
-    "description": "cost model for ems service",
-    "currency": "EUR",
-    "methodology": "duration",
-    "model": "PAYG",
-    "model_param": {},
-    "fix_cost": {
-        "setup_cost": 5
-    },
-    "name": "ems-model-A",
-    "var_rate": {
-        "cpu": 50,
-        "cpu_unit": "core-hour",
-        "disk": 1,
-        "disk_unit": "gb-hour",
-        "memory": 10,
-        "memory_unit": "gb-hour"
-    }
-}
-                </pre>
-                -->
-                <h4>Steps to follow</h4>
-                <ul>
-                    <li>decide on a TJob from the list</li>
-                    <li>press Analyze next to the job to perform static analysis</li>
-                    <ul>
-                        <li>shows cost implication from each support service used over a 2 hr time window</li>
-                    </ul>
-                    <li>once the TJob execution has finished, press True cost to get the actual cost of execution.</li>
-                </ul>
+
             </div>
         </div>
+    -->
+
     </div>
+    <!-- Jquery Core Js -->
+    <script src="assets/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap Core Js -->
+    <script src="assets/plugins/bootstrap/js/bootstrap.js"></script>
+    <!-- Select Plugin Js -->
+    <script src="assets/plugins/bootstrap-select/js/bootstrap-select.js"></script>
+    <!-- Slimscroll Plugin Js -->
+    <script src="assets/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
+    <!-- Waves Effect Plugin Js -->
+    <script src="assets/plugins/node-waves/waves.js"></script>
+    <!-- Autosize Plugin Js -->
+    <script src="assets/plugins/autosize/autosize.js"></script>
+    <!-- Moment Plugin Js -->
+    <script src="assets/plugins/momentjs/moment.js"></script>
+    <!-- Bootstrap Material Datetime Picker Plugin Js -->
+    <script src="assets/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js"></script>
+    <!-- Custom Js -->
+    <script src="assets/js/admin.js"></script>
+    <script src="assets/js/pages/forms/basic-form-elements.js"></script>
+    <!-- Demo Js -->
+    <script src="assets/js/demo.js"></script>
+
 </body>
 </html>

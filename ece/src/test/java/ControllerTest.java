@@ -91,6 +91,19 @@ public class ControllerTest {
     }
 
     @Test
+    public void getStaticAnalysisDataTest()
+    {
+        Controller controller = new Controller();
+        MockHttpServletRequest req = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        req.addParameter("tjobid", "1");
+        req.addParameter("tjobname", "Teacher and Student Testing");
+        req.addParameter("tjobservices", "[{\"id\": \"29216b91-497c-43b7-a5c4-6613f13fa0e9\",\"name\": \"EUS\",\"selected\": true,\"config\":{\"webRtcStats\":{\"name\": \"webRtcStats\",\"type\": \"boolean\",\"label\": \"Gather WebRTC Statistics\",\"default\": false,\"value\": false}}}]");
+        String value = controller.getStaticAnalysisData(req, response, model);
+        assertEquals("usagedata", value);
+    }
+
+    @Test
     public void showStaticAnalysisTest()
     {
         Controller controller = new Controller();
@@ -99,6 +112,12 @@ public class ControllerTest {
         req.addParameter("tjobid", "1");
         req.addParameter("tjobname", "Teacher and Student Testing");
         req.addParameter("tjobservices", "[{\"id\": \"29216b91-497c-43b7-a5c4-6613f13fa0e9\",\"name\": \"EUS\",\"selected\": true,\"config\":{\"webRtcStats\":{\"name\": \"webRtcStats\",\"type\": \"boolean\",\"label\": \"Gather WebRTC Statistics\",\"default\": false,\"value\": false}}}]");
+        req.addParameter("EUS_chrome_browser", "4");
+        req.addParameter("EUS_firefox_browser", "1");
+        req.addParameter("EUS_edge_browser", "1");
+        req.addParameter("EPM_ram", "0.25");
+        req.addParameter("EPM_cpu_usage", "0.25");
+        req.addParameter("EPM_net_traffic", "0.25");
         String value = controller.showStaticAnalysis(req, response, model);
         assertEquals("staticanalysis", value);
     }

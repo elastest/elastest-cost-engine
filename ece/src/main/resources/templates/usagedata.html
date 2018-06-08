@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!--
+  ~
+  ~  Copyright (c) 2018. Service Prototyping Lab, ZHAW
+  ~   All Rights Reserved.
+  ~
+  ~      Licensed under the Apache License, Version 2.0 (the "License"); you may
+  ~      not use this file except in compliance with the License. You may obtain
+  ~      a copy of the License at
+  ~
+  ~           http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~      Unless required by applicable law or agreed to in writing, software
+  ~      distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~      WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~      License for the specific language governing permissions and limitations
+  ~      under the License.
+  ~
+  ~
+  ~      Author: Piyush Harsh,
+  ~      URL: piyush-harsh.info
+  ~      Email: piyush.harsh@zhaw.ch
+  ~
+  -->
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>ElasTest Cost Engine</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+    <!-- Bootstrap Core Css -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <!-- Waves Effect Css -->
+    <link href="assets/plugins/node-waves/waves.css" rel="stylesheet" />
+    <!-- Animation Css -->
+    <link href="assets/plugins/animate-css/animate.css" rel="stylesheet" />
+    <!-- Bootstrap Material Datetime Picker Css -->
+    <link href="assets/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet" />
+    <!-- Wait Me Css -->
+    <link href="assets/plugins/waitme/waitMe.css" rel="stylesheet" />
+    <!-- Bootstrap Select Css -->
+    <link href="assets/plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
+    <!-- Custom Css -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
+    <link href="assets/css/themes/all-themes.css" rel="stylesheet" />
+</head>
+
+<body class="theme-orange">
+    <div class="container-fluid">
+        <div class="row clearfix">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="card">
+                    <div class="header">
+                        <h2 th:text="'Set your usage estimation for TJob: ' + ${tjobname} + ' (id=' + ${tjobid} + ')'">
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row clearfix">
+            <form class="col-xs-12 col-sm-12 col-md-12 col-lg-12" method="post" action="/showstaticanalysis">
+                <input type="hidden" name="tjobname" th:value="${tjobname}">
+                <input type="hidden" name="tjobid" th:value="${tjobid}">
+                <input type="hidden" name="tjobservices" th:value="${tjobservices}">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" th:each="service : ${servicemeterlist}">
+                    <div class="card">
+                        <div class="header">
+                            <h2 th:text="'Provide consumption estimates for service: ' + ${service.serviceName}">
+                                Service Name
+                            </h2>
+                        </div>
+                        <div class="body table-responsive">
+                            <table class="table table-bordered" style="text-align: left">
+                                <thead>
+                                <tr>
+                                    <th>Meter name</th>
+                                    <th>Usage volume</th>
+                                    <th>Unit</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="meter : ${service.meterList}">
+                                        <th scope="row"><span th:text="${meter.get('meter_name')}">meter</span></th>
+                                        <td><input type="number" step="0.01" min=0 th:name="@{${service.serviceName} + '_' + ${meter.get('meter_name')}}"></td>
+                                        <td><span th:text="${meter.get('unit')}"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- this is a fixed form for infrastructure resources -->
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="card">
+                        <div class="header">
+                            <h2>
+                                Provide consumption estimates for infrastructure usage by your TJob
+                            </h2>
+                        </div>
+                        <div class="body table-responsive">
+                            <table class="table table-bordered" style="text-align: left">
+                                <thead>
+                                <tr>
+                                    <th>Meter name</th>
+                                    <th>Usage volume</th>
+                                    <th>Unit</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th scope="row"><span>ram</span></th>
+                                    <td><input type="number" step="0.01" min=0 name="EPM_ram"></td>
+                                    <td><span>mb-hour</span></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><span>cpu_usage</span></th>
+                                    <td><input type="number" step="0.01" min=0 name="EPM_cpu_usage"></td>
+                                    <td><span>million-cycles</span></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><span>net_traffic</span></th>
+                                    <td><input type="number" step="0.01" min=0 name="EPM_net_traffic"></td>
+                                    <td><span>kb</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <button type="submit" class="btn btn-primary btn-raised">SUBMIT DATA</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Jquery Core Js -->
+    <script src="assets/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap Core Js -->
+    <script src="assets/plugins/bootstrap/js/bootstrap.js"></script>
+    <!-- Select Plugin Js -->
+    <script src="assets/plugins/bootstrap-select/js/bootstrap-select.js"></script>
+    <!-- Slimscroll Plugin Js -->
+    <script src="assets/plugins/jquery-slimscroll/jquery.slimscroll.js"></script>
+    <!-- Waves Effect Plugin Js -->
+    <script src="assets/plugins/node-waves/waves.js"></script>
+    <!-- Autosize Plugin Js -->
+    <script src="assets/plugins/autosize/autosize.js"></script>
+    <!-- Moment Plugin Js -->
+    <script src="assets/plugins/momentjs/moment.js"></script>
+    <!-- Bootstrap Material Datetime Picker Plugin Js -->
+    <script src="assets/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js"></script>
+    <!-- Custom Js -->
+    <script src="assets/js/admin.js"></script>
+    <script src="assets/js/pages/forms/basic-form-elements.js"></script>
+    <!-- Demo Js -->
+    <script src="assets/js/demo.js"></script>
+
+</body>
+</html>

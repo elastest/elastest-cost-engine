@@ -123,7 +123,7 @@
                     <argLine>-Xmx1024m</argLine>
                     <environmentVariables>
                         <ET_ETM_API>http://nightly.elastest.io:37006/</ET_ETM_API>
-                        <ET_ESM_API>http://nightly.elastest.io:37005/</ET_ESM_API>
+                        <ET_ESM_API>http://sentinel.cloudlab.zhaw.ch:8080/</ET_ESM_API>
                     </environmentVariables>
                 </configuration>
             </plugin>
