@@ -67,36 +67,9 @@
                 <input type="hidden" name="tjobname" th:value="${tjobname}">
                 <input type="hidden" name="tjobid" th:value="${tjobid}">
                 <input type="hidden" name="tjobservices" th:value="${tjobservices}">
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" th:each="service : ${servicemeterlist}">
-                    <div class="card">
-                        <div class="header">
-                            <h2 th:text="'Provide consumption estimates for service: ' + ${service.serviceName}">
-                                Service Name
-                            </h2>
-                        </div>
-                        <div class="body table-responsive">
-                            <table class="table table-bordered" style="text-align: left">
-                                <thead>
-                                <tr>
-                                    <th>Meter name</th>
-                                    <th>Usage volume</th>
-                                    <th>Unit</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="meter : ${service.meterList}">
-                                        <th scope="row"><span th:text="${meter.get('meter_name')}">meter</span></th>
-                                        <td><input type="number" step="0.01" min=0 th:name="@{${service.serviceName} + '_' + ${meter.get('meter_name')}}"></td>
-                                        <td><span th:text="${meter.get('unit')}"></span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- this is a fixed form for infrastructure resources -->
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="card">
                         <div class="header">
                             <h2>
@@ -121,13 +94,41 @@
                                 <tr>
                                     <th scope="row"><span>cpu_usage</span></th>
                                     <td><input type="number" step="0.01" min=0 name="EPM_cpu_usage"></td>
-                                    <td><span>million-cycles</span></td>
+                                    <td><span>core-hour</span></td>
                                 </tr>
                                 <tr>
                                     <th scope="row"><span>net_traffic</span></th>
                                     <td><input type="number" step="0.01" min=0 name="EPM_net_traffic"></td>
                                     <td><span>kb</span></td>
                                 </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:each="service,iter : ${servicemeterlist}">
+                    <div class="card">
+                        <div class="header">
+                            <h2 th:text="'Provide consumption estimates for service: ' + ${service.serviceName}">
+                                Service Name
+                            </h2>
+                        </div>
+                        <div class="body table-responsive">
+                            <table class="table table-bordered" style="text-align: left">
+                                <thead>
+                                <tr>
+                                    <th>Meter name</th>
+                                    <th>Usage volume</th>
+                                    <th>Unit</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="meter : ${service.meterList}">
+                                        <th scope="row"><span th:text="${meter.get('meter_name')}">meter</span></th>
+                                        <td><input type="number" step="0.01" min=0 th:name="@{${service.serviceName} + '_' + ${meter.get('meter_name')}}"></td>
+                                        <td><span th:text="${meter.get('unit')}"></span></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

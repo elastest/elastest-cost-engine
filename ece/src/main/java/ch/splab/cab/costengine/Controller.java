@@ -174,6 +174,8 @@ public class Controller {
             logger.info("Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
         }
 
+        boolean isInfraModelFound = false;
+
         String tjobId = request.getParameter("tjobid");
         String tjobName = request.getParameter("tjobname");
         String tjobServices = request.getParameter("tjobservices");
@@ -222,9 +224,13 @@ public class Controller {
 
                         for(ESMService catalogService:catalog.services)
                         {
+                            if(catalogService.short_name.equalsIgnoreCase("epm"))
+                                isInfraModelFound = true;
+
                             if(catalogService.id.equalsIgnoreCase(service.id))
                             {
                                 logger.info("Catalog matching entry for support service: " + service.id + " with short-name: " + catalogService.short_name + " located.");
+
                                 for(ESMServicePlan plan:catalogService.plans)
                                 {
                                     logger.info("Proceeding to analyze cost with plan-id: " + plan.id);
@@ -274,48 +280,92 @@ public class Controller {
                                             }
                                         }
                                     }
-
-//                                    for(Object key: varRate.keySet().toArray())
-//                                    {
-//                                        String keyName = new String((String) key);
-//                                        Double keyRate = new Double((double)varRate.get(key));
-//                                        logger.info("Var rate element: " + keyName + ":" + keyRate);
-//                                    }
-//                                    double incrementalCost = ((double)varRate.get("disk") + (double)varRate.get("memory") + (double)varRate.get("cpus")) / 60.0;
-//                                    Object[][] piedata = new Object[5][2];
-//                                    piedata[0][0] = "model elements";
-//                                    piedata[0][1] = "value";
-//                                    piedata[1][0] = "deployment";
-//                                    piedata[1][1] = (double)fixCost.get("deployment");
-//                                    piedata[2][0] = "disk";
-//                                    piedata[2][1] = (double)varRate.get("disk");
-//                                    piedata[3][0] = "memory";
-//                                    piedata[3][1] = (double)varRate.get("memory");
-//                                    piedata[4][0] = "cpus";
-//                                    piedata[4][1] = (double)varRate.get("cpus");
-//
-//                                    double[][] data = new double[120][2];
-//                                    for(int i=0; i<120; i++)
-//                                    {
-//                                        if(i==0 && fixCost.containsKey("deployment"))
-//                                            data[i] = new double[]{(i+1), new Double((double)fixCost.get("deployment")).doubleValue()};
-//                                        else
-//                                        {
-//                                            if(i!=0)
-//                                                data[i] = new double[]{(i+1), data[i-1][1] + incrementalCost};
-//                                            else
-//                                                data[i] = new double[]{(i+1), incrementalCost};
-//                                        }
-//                                    }
-//                                    part.data = data;
-//                                    part.piedata = piedata;
                                     costBreakup.add(part);
                                 }
                             }
                         }
                     }
                 }
+
                 LinkedList<ECEUsageBarElement> infrabarElements = new LinkedList<>();
+
+                //process infra costs if not found in list from esm
+                //TODO: find a reasonable way to get the below hardcoded parameters
+                if(!isInfraModelFound)
+                {
+                    logger.info("Proceeding to analyze infrastructure costs next (not located in ESM data): ");
+                    ECECostModel cModel = new ECECostModel();
+                    cModel.currency = "eur";
+                    cModel.description = "Infrastructure cost model";
+                    cModel.model = "pay-as-you-go";
+                    HashMap mParam = new HashMap();
+                    mParam.put("setup_cost", 0.0d);
+                    cModel.model_param = mParam;
+                    cModel.shortName = "EPM";
+                    HashMap[] mList = new HashMap[3];
+                    mList[0] = new HashMap();
+                    mList[1] = new HashMap();
+                    mList[2] = new HashMap();
+                    mList[0].put("meter_name", "ram");
+                    mList[0].put("meter_type", "gauge");
+                    mList[0].put("unit_cost", 0.00125d);
+                    mList[0].put("unit", "mb-hour");
+                    mList[1].put("meter_name", "cpu_usage");
+                    mList[1].put("meter_type", "gauge");
+                    mList[1].put("unit_cost", 0.021d);
+                    mList[1].put("unit", "core-hour");
+                    mList[2].put("meter_name", "net_traffic");
+                    mList[2].put("meter_type", "gauge");
+                    mList[2].put("unit_cost", 0.00075d);
+                    mList[2].put("unit", "kb");
+                    cModel.meter_list = mList;
+
+                    serviceCostModelList.add(cModel);
+                    if(cModel.model_param.containsKey("setup_cost"))
+                    {
+                        ECEPieElement pEle = new ECEPieElement();
+                        pEle.legend = cModel.shortName + "::setup_cost";
+                        pEle.value = ((Double)cModel.model_param.get("setup_cost")).doubleValue();
+                        totalCostPie.add(pEle);
+                    }
+
+                    StaticCostComponent part = new StaticCostComponent();
+                    part.serviceName = "";
+                    part.description = cModel.description;
+                    part.planId = "";
+                    part.serviceId = "";
+
+                    for(HashMap meter: cModel.meter_list)
+                    {
+                        if(request.getParameter(cModel.shortName + "_" + meter.get("meter_name")) != null)
+                        {
+                            try
+                            {
+                                logger.info("Meter: " + meter.get("meter_name") + ", cost: " + meter.get("unit_cost") + ", usage: "
+                                        + Double.parseDouble(request.getParameter(cModel.shortName + "_" + meter.get("meter_name")))
+                                        + ", total cost: "
+                                        + (Double.parseDouble(request.getParameter(cModel.shortName + "_" + meter.get("meter_name"))) * ((Double)meter.get("unit_cost")).floatValue()));
+                                double componentCost = Double.parseDouble(request.getParameter(cModel.shortName + "_" + meter.get("meter_name"))) * ((Double)meter.get("unit_cost")).doubleValue();
+                                ECEPieElement pEle = new ECEPieElement();
+                                pEle.legend = cModel.shortName + "::" + meter.get("meter_name");
+                                pEle.value = componentCost;
+                                totalCostPie.add(pEle);
+                                ECEUsageBarElement bEle = new ECEUsageBarElement();
+                                bEle.value = Double.parseDouble(request.getParameter(cModel.shortName + "_" + meter.get("meter_name")));
+                                bEle.legend = cModel.shortName + "::" + meter.get("meter_name") + " (" + meter.get("unit") + ")";
+                                infrabarElements.add(bEle);
+                            }
+                            catch(Exception ex)
+                            {
+                                //NaN error
+                                logger.warn(ex.getMessage());
+                            }
+                        }
+                    }
+                    costBreakup.add(part);
+                }
+
+
                 for(ESMService catalogService:catalog.services)
                 {
                     if (catalogService.name.equalsIgnoreCase("EPM"))
