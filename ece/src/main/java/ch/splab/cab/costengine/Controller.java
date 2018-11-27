@@ -37,9 +37,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @org.springframework.stereotype.Controller
 public class Controller {
@@ -75,6 +74,244 @@ public class Controller {
         else
             logger.warn("Unable to call TORM API");
         return "index";
+    }
+
+    @RequestMapping(value="/dynamicanalysis", method = RequestMethod.POST)
+    public String getDynamicAnalysisData(HttpServletRequest request, HttpServletResponse response, Model model) {
+        String tjobId = request.getParameter("tjobid");
+        String tjobName = request.getParameter("tjobname");
+        model.addAttribute("tjobid", tjobId);
+        model.addAttribute("tjobname", tjobName);
+        String tjobServices = request.getParameter("tjobservices");
+        model.addAttribute("tjobservices", tjobServices);
+        logger.info("Support services list for TJob " + tjobName + ": " + tjobServices);
+        logger.info("Dynamic analysis request received: job-id:" + tjobId + " job-name:" + tjobName + " services-string: " + tjobServices);
+        Gson gson = new Gson();
+        TJobService[] services;
+        try
+        {
+            services = gson.fromJson(tjobServices, TJobService[].class);
+            logger.info("Starting analysis, services list count: " + services.length);
+        }
+        catch (Exception ex)
+        {
+            logger.warn("Error in parsing support service string received from TORM: " + ex.getMessage() + ":" + ex.getLocalizedMessage());
+            throw ex; //to show the error message
+        }
+
+        //getting the service catalog
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("X_Broker_Api_Version", "2.12");
+        Response restResponse = RESTDriver.doGet(AppConfiguration.getESMApi() + "v2/catalog", headers);
+
+        if(restResponse.code() == 200) {
+            logger.info("Call to ESM API: status OK");
+            try {
+                String body = restResponse.body().string();
+                ESMCatalog catalog = gson.fromJson(body, ESMCatalog.class);
+                logger.info("from ESM received catalog entries: " + catalog.services.length);
+                LinkedList<ECECostModel> serviceCostModelList = new LinkedList();
+
+                for(TJobService service:services)
+                {
+                    if(service.selected) {
+                        logger.info("Found an enabled service for selected TJob: " + service.name + " id: " + service.id);
+                        //now analyzing the cost for this particular service and adding a separate entry in model variable
+
+                        for (ESMService catalogService : catalog.services) {
+
+                            if (catalogService.id.equalsIgnoreCase(service.id)) {
+                                logger.info("Catalog matching entry for support service: " + service.id + " with short-name: " + catalogService.short_name + " located.");
+
+                                for (ESMServicePlan plan : catalogService.plans) {
+                                    logger.info("Proceeding to analyze cost with plan-id: " + plan.id);
+                                    logger.info("Found ece cost model: " + plan.metadata.costs.description);
+                                    ECECostModel cModel = plan.metadata.costs;
+                                    cModel.shortName = catalogService.short_name;
+
+                                    serviceCostModelList.add(cModel);
+                                }
+                            }
+                        }
+                    }
+                }
+                restResponse.close();
+
+                ECECostModel cModel = new ECECostModel();
+                cModel.currency = "eur";
+                cModel.description = "Infrastructure cost model";
+                cModel.model = "pay-as-you-go";
+                HashMap mParam = new HashMap();
+                mParam.put("setup_cost", 0.0d);
+                cModel.model_param = mParam;
+                cModel.shortName = "Infrastructure";
+                HashMap[] mList = new HashMap[3];
+                mList[0] = new HashMap();
+                mList[1] = new HashMap();
+                mList[2] = new HashMap();
+                mList[0].put("meter_name", "ram");
+                mList[0].put("meter_type", "gauge");
+                mList[0].put("unit_cost", 0.00125d);
+                mList[0].put("unit", "mb-hour");
+                mList[1].put("meter_name", "cpu_usage");
+                mList[1].put("meter_type", "gauge");
+                mList[1].put("unit_cost", 0.021d);
+                mList[1].put("unit", "core-hour");
+                mList[2].put("meter_name", "net_traffic");
+                mList[2].put("meter_type", "gauge");
+                mList[2].put("unit_cost", 0.00075d);
+                mList[2].put("unit", "kb");
+                cModel.meter_list = mList;
+
+                serviceCostModelList.add(cModel);
+                model.addAttribute("servicecostmodellist", serviceCostModelList);
+
+                //make a call to events service using TJob-ID as account field, and time range 0 until now
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                long currTime = System.currentTimeMillis();
+                cal.setTimeInMillis(currTime); // compute start of the day for the timestamp
+                Date date = new java.util.Date(currTime);
+                // the format of your date
+                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+                // give a timezone reference for formatting (see comment at the bottom)
+                sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                String formattedDate = sdf.format(date);
+                model.addAttribute("timestring", formattedDate);
+
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+
+                long timeStart = cal.getTimeInMillis()/1000L;
+                long timeEnd = System.currentTimeMillis() / 1000L;
+                long timeBucket = 3600L; //buckets of 1 hr window
+
+                logger.info("Timestamp at start of this date in UTC is: " + (cal.getTimeInMillis()/1000));
+                LinkedHashSet<Object> resourceList = new LinkedHashSet<Object>(); //to collect unique resourceNames
+                LinkedList<Object> usageList = new LinkedList<>(); //to collect usage for googleMap
+                LinkedList<Object> infraUsageList = new LinkedList<>(); //to collect usage for googleMap
+                LinkedHashSet<Object> infraResourceList = new LinkedHashSet<Object>(); //to collect unique resourceNames
+                Object[][] piedata = null;
+                double totalCost = 0.0d;
+
+                headers = new HashMap<>();
+                headers.put("x-auth-apikey", AppConfiguration.getEMPApikey());
+                headers.put("x-auth-login", AppConfiguration.getEMPUser());
+                headers.put("x-series-name", AppConfiguration.getEMPSeries());
+                headers.put("x-topic-name", AppConfiguration.getEMPTopic());
+                logger.debug("REST API headers: " + headers.toString());
+
+                restResponse = RESTDriver.doGet(AppConfiguration.getEMPApi() + tjobId, headers);
+
+                resourceList.add("Test Run ID");
+                resourceList.add("Duration");
+                usageList.add(0, resourceList);
+
+                infraResourceList.add("Test Run ID");
+                infraResourceList.add("Net Rx (bytes)");
+                infraResourceList.add("Net Tx (bytes)");
+                infraResourceList.add("Memory");
+                infraUsageList.add(0, infraResourceList);
+
+                //pass 1 to build the resource index
+
+                if(restResponse.code() == 200)
+                {
+                    body = restResponse.body().string();
+                    TestRuns tUsage = gson.fromJson(body, TestRuns.class);
+                    if(tUsage != null && tUsage.ExecutionRun != null)
+                    {
+                        int index = 1;
+                        piedata = new Object[tUsage.ExecutionRun.length+1][2];
+                        piedata[0][0] = "Test run";
+                        piedata[0][1] = "Cost";
+
+                        for(ExecutionRunData tRun :tUsage.ExecutionRun) {
+                            LinkedList<Object> dataList = new LinkedList<>(); //to collect usage for googleMap
+                            LinkedList<Object> infradataList = new LinkedList<>(); //to collect usage for googleMap
+
+                            piedata[index][0] = tRun.ExecId;
+
+                            //convert active time to hour
+                            double duration = tRun.duration / (60.0d * 60.0d);
+
+                            double cpu_cost = 0.0d;
+                            double mem_cost = 0.0d;
+                            double net_cost = 0.0d;
+
+                            double net_total_usage = tRun.network_rx_bytes + tRun.network_tx_bytes;
+                            if(mList[2].get("unit").toString().equalsIgnoreCase("kb"))
+                                net_total_usage /= 1024.0d;
+
+                            net_cost = net_total_usage * Double.parseDouble(mList[2].get("unit_cost").toString());
+                            mem_cost = (tRun.memory_mean / (1024.0d * 1024.0d)) * duration
+                                    * Double.parseDouble(mList[0].get("unit_cost").toString());
+                            cpu_cost = duration * Double.parseDouble(mList[1].get("unit_cost").toString()) * 1.0d; //assuming only single core for now
+
+                            piedata[index][1] = (net_cost + mem_cost + cpu_cost);
+                            totalCost += (net_cost + mem_cost + cpu_cost);
+
+                            dataList.add(tRun.ExecId);
+                            dataList.add(tRun.duration);
+
+                            infradataList.add(tRun.ExecId);
+                            infradataList.add(tRun.network_rx_bytes);
+                            infradataList.add(tRun.network_tx_bytes);
+                            infradataList.add(tRun.memory_mean);
+
+                            logger.info("Found exec id: " + tRun.ExecId + ", for TJob: " + tUsage.TJobId + ", Usage:[(mem, " + tRun.memory_mean +
+                                    "), (net-rx, " + tRun.network_rx_bytes + "), (net-tx, " + tRun.network_tx_bytes + ")]");
+                            usageList.add(index, dataList);
+                            infraUsageList.add(index, infradataList);
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        logger.warn("No data received.");
+                    }
+                }
+                restResponse.close();
+
+                //if resourceList is empty, add a placeholder 2nd column for GCharts
+                if(resourceList.size() == 1)
+                    resourceList.add("usageVal");
+
+                //model.addAttribute("timeline", timeline);
+                model.addAttribute("usage", usageList);
+                //now create the structure that google charts expect
+                model.addAttribute("infrausagebardata", infraUsageList);
+                model.addAttribute("piedata", piedata);
+                model.addAttribute("totalcost", Math.round(totalCost * 100.0) / 100.0);
+            }
+            catch(IOException ioex)
+            {
+                ioex.printStackTrace();
+                logger.warn("Error in parsing ESM catalog details: " + ioex.getMessage() + ":" + ioex.getLocalizedMessage());
+            }
+            catch(Exception ex)
+            {
+                logger.warn("Unhandled exception is processing catalog data: " + ex.getMessage() + ":" + ex.getLocalizedMessage());
+                throw ex;
+            }
+        }
+        else
+        {
+            logger.warn("Unable to call ESM API");
+        }
+
+        return "dynamicanalysis";
+    }
+
+    private int getIndexAt(String resourceName, List<Object> resourceList) {
+        int index = -1;
+        for(Object obj: resourceList)
+        {
+            index++;
+            if(obj.equals(resourceName)) return index;
+        }
+        return -1;
     }
 
     @RequestMapping(value="/staticanalysis", method = RequestMethod.POST)
@@ -159,7 +396,7 @@ public class Controller {
         }
         else
         {
-            logger.warn("Unable to call ESM API");
+            logger.warn("Unable to call ESM API properly.");
         }
         return "usagedata";
     }
