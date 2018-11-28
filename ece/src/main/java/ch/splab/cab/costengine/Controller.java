@@ -192,6 +192,7 @@ public class Controller {
                 LinkedList<Object> usageList = new LinkedList<>(); //to collect usage for googleMap
                 LinkedList<Object> infraUsageList = new LinkedList<>(); //to collect usage for googleMap
                 LinkedHashSet<Object> infraResourceList = new LinkedHashSet<Object>(); //to collect unique resourceNames
+                LinkedList<Object> scostList = new LinkedList<>(); //to collect service cost components for googleMap
                 Object[][] piedata = null;
                 double totalCost = 0.0d;
 
@@ -214,6 +215,13 @@ public class Controller {
                 infraResourceList.add("Memory");
                 infraUsageList.add(0, infraResourceList);
 
+                LinkedHashSet<Object> costbreakuplabel = new LinkedHashSet<Object>(); //to collect cost component names
+                costbreakuplabel.add("Test Run ID");
+                costbreakuplabel.add("CPU cost");
+                costbreakuplabel.add("MEM cost");
+                costbreakuplabel.add("NET cost");
+                scostList.add(0, costbreakuplabel);
+
                 //pass 1 to build the resource index
 
                 if(restResponse.code() == 200)
@@ -230,8 +238,10 @@ public class Controller {
                         for(ExecutionRunData tRun :tUsage.ExecutionRun) {
                             LinkedList<Object> dataList = new LinkedList<>(); //to collect usage for googleMap
                             LinkedList<Object> infradataList = new LinkedList<>(); //to collect usage for googleMap
+                            LinkedList<Object> costList = new LinkedList<>(); //to collect cost breakup for googleMap
 
                             piedata[index][0] = tRun.ExecId;
+                            costList.add(tRun.ExecId);
 
                             //convert active time to hour
                             double duration = tRun.duration / (60.0d * 60.0d);
@@ -249,6 +259,10 @@ public class Controller {
                                     * Double.parseDouble(mList[0].get("unit_cost").toString());
                             cpu_cost = duration * Double.parseDouble(mList[1].get("unit_cost").toString()) * 1.0d; //assuming only single core for now
 
+                            costList.add(cpu_cost);
+                            costList.add(mem_cost);
+                            costList.add(net_cost);
+
                             piedata[index][1] = (net_cost + mem_cost + cpu_cost);
                             totalCost += (net_cost + mem_cost + cpu_cost);
 
@@ -264,6 +278,7 @@ public class Controller {
                                     "), (net-rx, " + tRun.network_rx_bytes + "), (net-tx, " + tRun.network_tx_bytes + ")]");
                             usageList.add(index, dataList);
                             infraUsageList.add(index, infradataList);
+                            scostList.add(index, costList);
                             index++;
                         }
                     }
@@ -284,6 +299,7 @@ public class Controller {
                 model.addAttribute("infrausagebardata", infraUsageList);
                 model.addAttribute("piedata", piedata);
                 model.addAttribute("totalcost", Math.round(totalCost * 100.0) / 100.0);
+                model.addAttribute("costbreakup", scostList);
             }
             catch(IOException ioex)
             {
