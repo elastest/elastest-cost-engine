@@ -217,9 +217,13 @@ public class Controller {
 
                 LinkedHashSet<Object> costbreakuplabel = new LinkedHashSet<Object>(); //to collect cost component names
                 costbreakuplabel.add("Test Run ID");
-                costbreakuplabel.add("CPU cost");
-                costbreakuplabel.add("MEM cost");
-                costbreakuplabel.add("NET cost");
+                costbreakuplabel.add("Infra: CPU");
+                costbreakuplabel.add("Infra: MEM");
+                costbreakuplabel.add("Infra: NET");
+                for(ECECostModel support :  serviceCostModelList)
+                    if(support.shortName.equalsIgnoreCase("Infrastructure")) continue;
+                    else
+                        costbreakuplabel.add("Support: " + support.shortName);
                 scostList.add(0, costbreakuplabel);
 
                 //pass 1 to build the resource index
@@ -262,6 +266,18 @@ public class Controller {
                             costList.add(cpu_cost);
                             costList.add(mem_cost);
                             costList.add(net_cost);
+
+                            for(ECECostModel support :  serviceCostModelList)
+                            {
+                                if(support.shortName.equalsIgnoreCase("Infrastructure")) continue;
+
+                                logger.info("Processing support cost model for service: " + support.shortName);
+                                logger.info(support.shortName + " :: setup cost=" + support.model_param.get("setup_cost"));
+                                //right now consider only setup cost, and later do time based cost computation
+                                //ignoring meter list as of now
+                                double supportCost = 0.0d;
+                                costList.add((double)support.model_param.get("setup_cost") + supportCost);
+                            }
 
                             piedata[index][1] = (net_cost + mem_cost + cpu_cost);
                             totalCost += (net_cost + mem_cost + cpu_cost);
