@@ -30,7 +30,7 @@
 
     <groupId>ch.splab.cab</groupId>
     <artifactId>cost-engine</artifactId>
-    <version>0.1.0</version>
+    <version>0.9.0</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -124,6 +124,11 @@
                     <environmentVariables>
                         <ET_ETM_API>http://nightly.elastest.io:37006/</ET_ETM_API>
                         <ET_ESM_API>http://sentinel.cloudlab.zhaw.ch:8080/</ET_ESM_API>
+                        <ET_EMP_API>http://sentinel.cloudlab.zhaw.ch:9000/v1/extension/elastest/tjobstat/</ET_EMP_API>
+                        <ET_EMP_APIKEY>a733a767-42ec-4ed8-b53b-15b3c87b3c86</ET_EMP_APIKEY>
+                        <ET_EMP_USER>elastest</ET_EMP_USER>
+                        <ET_EMP_TOPIC>user-1-elastest_core</ET_EMP_TOPIC>
+                        <ET_EMP_SERIES>docker-stats</ET_EMP_SERIES>
                     </environmentVariables>
                 </configuration>
             </plugin>
