@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ECEElasTestInElasTestTest {
+public class ECEElasTestInElasTestTest extends ElastestBaseTest {
     private static final Logger logger = LogManager.getLogger("ECEElasTestInElasTestTest");
     @Test
     @DisplayName("Test to start ECE")
