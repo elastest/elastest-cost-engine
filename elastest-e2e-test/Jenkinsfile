@@ -20,7 +20,7 @@ node('et_in_et') {
                     try {
                         sh 'env'
                         sh 'pwd'
-                        sh "cd elastest-e2e-test; mvn -B clean test -Duser=elastest -DetmUrl="+elastestURL //the full url should be parametrized (including protocol)
+                        sh "cd elastest-e2e-test; mvn -B clean test -DetmUrl="+elastestURL //the full url should be parametrized (including protocol)
                     } catch(e) {
                         echo 'Err: ' + e.toString()
                     } finally {
