@@ -1,0 +1,42 @@
+@Library('ciElastestConnect') _
+elastest_lib.setVersion('dev')
+
+// initialization of the context for the library
+elastest_lib.setContext(this)
+
+// initialization of the runnable object to access elastest methods inside the pipeline
+def elastest= elastest_lib.getElastestMethods()
+
+elastest_lib.pipeline({
+	try {
+		        stage ('docker container')
+				def mycontainer = elastest.ctx.docker.image('elastest/ci-docker-e2e:latest')
+				mycontainer.pull()
+				mycontainer.inside("-u jenkins -v /var/run/docker.sock:/var/run/docker.sock:rw -v /dev/shm:/dev/shm") {
+					elastest.connect2ElastestNetwork()
+					def elastestURL = elastest.getEtmUrl()
+
+					stage ('fetch git repo')
+						git 'https://github.com/elastest/elastest-cost-engine.git'
+
+				}
+	} catch (err) {
+		echo 'Error!!! Send email to the people responsible for the builds.'
+		emailext body: 'Please go to  ${BUILD_URL}  and verify the build',
+		replyTo: '${BUILD_USER_EMAIL}', 
+		subject: 'Job ${JOB_NAME} - ${BUILD_NUMBER} RESULT: ${BUILD_STATUS}', 
+		to: '${MAIL_LIST}'
+		throw err
+	}
+})
+
+def containerIp(containerName, network) {
+	echo "Inside containerIp function"
+	containerIp = sh (
+		script: "docker inspect --format=\"{{.NetworkSettings.Networks."+network+".IPAddress}}\" "+ containerName,
+		returnStdout: true
+	).trim()
+
+	echo containerName+" IP = " + containerIp;
+	return containerIp;
+}
