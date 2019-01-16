@@ -7,14 +7,27 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static java.util.logging.Level.ALL;
+import static org.openqa.selenium.logging.LogType.BROWSER;
+import static org.openqa.selenium.remote.CapabilityType.LOGGING_PREFS;
+import static org.openqa.selenium.remote.DesiredCapabilities.chrome;
+
+import ch.splab.cab.elastest_e2e_elastest.DriverCapabilities;
 
 public class ElastestBaseTest {
     protected static final Logger logger = LogManager
@@ -29,6 +42,14 @@ public class ElastestBaseTest {
     protected static String sutUrl;
 
     protected WebDriver driver;
+
+    @DriverCapabilities
+    DesiredCapabilities capabilities = chrome();
+    {
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(BROWSER, ALL);
+        capabilities.setCapability(LOGGING_PREFS, logPrefs);
+    }
 
     @BeforeAll
     public static void setupClass() {
@@ -65,7 +86,7 @@ public class ElastestBaseTest {
         } else {
             DesiredCapabilities caps;
             if (browserType == null || browserType.equals(CHROME)) {
-                caps = DesiredCapabilities.chrome();
+                caps = chrome();
             } else {
                 caps = DesiredCapabilities.firefox();
             }
