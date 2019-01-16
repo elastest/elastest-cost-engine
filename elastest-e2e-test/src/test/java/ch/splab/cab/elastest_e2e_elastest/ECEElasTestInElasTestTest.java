@@ -26,8 +26,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ECEElasTestInElasTestTest extends ElastestBaseTest {
     private static final Logger logger = LogManager.getLogger("ECEElasTestInElasTestTest");
@@ -35,6 +38,7 @@ public class ECEElasTestInElasTestTest extends ElastestBaseTest {
     @DisplayName("Test to start ECE")
     void check4ece()
     {
+        boolean hasECEStarted = false;
         // elastest_url = env.ET_SUT_PROTOCOL + '://elastest:3xp3r1m3nt47@' + env.ET_SUT_HOST + ':' + env.ET_SUT_PORT
         String tormURL = System.getenv("etEtmUrl");
         logger.info("Torm Url: " + tormURL);
@@ -55,5 +59,38 @@ public class ECEElasTestInElasTestTest extends ElastestBaseTest {
 
         logger.info("Engines Page title: " + driver.getTitle());
         logger.info("Starting ece engine");
+        try
+        {
+            driver.findElement(By.xpath("//span[text()='ece']//following::button[@title='Start Engine']")).click();
+            new WebDriverWait(driver, 60)
+                    .ignoring(StaleElementReferenceException.class)
+                    .until((WebDriver d) -> {
+                        WebElement we = d.findElement(By.xpath("(//button[@title='View Engine'])"));
+                        logger.info(we.getAttribute("title"));
+                        logger.info(we.getTagName());
+                        we.click();
+                        return true;
+                    });
+            hasECEStarted = true;
+            logger.info("Redirected to " + driver.getCurrentUrl() + ". Switching focus to iFrame");
+            driver.switchTo().frame(driver.findElement(By.name("engine")));
+        }
+        catch(Exception ex)
+        {
+            logger.error("ece page took too long to open or was already open, try direct link please.");
+            hasECEStarted = false;
+        }
+
+        if(hasECEStarted)
+        {
+            assertTrue(driver.findElement(By.className("container-fluid")).isDisplayed());
+        }
+        else
+        {
+            logger.info("Directly accessing ece page assuming engine actually started");
+            assertEquals(driver.getCurrentUrl(), tormURL + "/#/test-engines");
+            //driver.navigate().to(tormURL + "/#/test-engines/ece");
+            //assertEquals(driver.getCurrentUrl(), tormURL + "/#/test-engines/ece");
+        }
     }
 }
