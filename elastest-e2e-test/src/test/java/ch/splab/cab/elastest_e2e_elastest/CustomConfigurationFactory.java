@@ -22,7 +22,7 @@ import static org.apache.logging.log4j.core.config.builder.api.ConfigurationBuil
 public class CustomConfigurationFactory extends ConfigurationFactory {
     static Configuration createConfiguration(final String name, ConfigurationBuilder<BuiltConfiguration> builder) {
         builder.setConfigurationName(name);
-        builder.setStatusLevel(Level.ERROR);
+        builder.setStatusLevel(Level.TRACE);
         builder.add(builder.newFilter("ThresholdFilter", Filter.Result.ACCEPT, Filter.Result.NEUTRAL).
                 addAttribute("level", Level.DEBUG));
         AppenderComponentBuilder appenderBuilder = builder.newAppender("Stdout", "CONSOLE").
