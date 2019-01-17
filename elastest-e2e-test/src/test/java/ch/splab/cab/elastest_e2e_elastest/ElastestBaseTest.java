@@ -42,7 +42,13 @@ public class ElastestBaseTest {
     protected static String eusURL;
     protected static String sutUrl;
 
-    protected WebDriver driver;
+    protected String tormUrl = "http://172.17.0.1:37000/"; // local by default
+    protected String secureTorm = "http://user:pass@172.17.0.1:37000/";
+    protected String eUser = null;
+    protected String ePassword = null;
+    protected boolean secureElastest = false;
+
+    public WebDriver driver;
 
     @DriverCapabilities
     DesiredCapabilities capabilities = chrome();
@@ -83,6 +89,33 @@ public class ElastestBaseTest {
         String testName = info.getTestMethod().get().getName();
         logger.info("##### Start test: {}", testName);
 
+        String etmApi = getProperty("etEtmApi");
+        if (etmApi != null) {
+            tormUrl = etmApi;
+        }
+        String elastestUser = getProperty("eUser");
+        if (elastestUser != null) {
+            logger.info("Elastest User received: {}", elastestUser);
+            eUser = elastestUser;
+
+            String elastestPassword = getProperty("ePass");
+            if (elastestPassword != null) {
+                logger.info("Elastest Password received: {}", elastestPassword);
+                ePassword = elastestPassword;
+                secureElastest = true;
+            }
+
+        }
+
+        if (secureElastest) {
+            String split_url[] = tormUrl.split("//");
+            tormUrl = split_url[0] + "//" + eUser + ":" + ePassword + "@"
+                    + split_url[1];
+        }
+
+        logger.info("Using URL {} to connect to {} TORM", tormUrl,
+                secureElastest ? "secure" : "unsecure");
+
         if (eusURL == null) {
             if (browserType == null || browserType.equals(CHROME)) {
                 driver = new ChromeDriver();
@@ -107,7 +140,7 @@ public class ElastestBaseTest {
             driver = new RemoteWebDriver(new URL(eusURL), caps);
         }
 
-        driver.get(sutUrl);
+        driver.get(tormUrl);
     }
 
     @AfterEach

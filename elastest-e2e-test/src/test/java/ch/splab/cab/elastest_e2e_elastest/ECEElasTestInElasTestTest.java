@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static java.lang.System.getProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,11 +41,11 @@ public class ECEElasTestInElasTestTest extends ElastestBaseTest {
     {
         boolean hasECEStarted = false;
         // elastest_url = env.ET_SUT_PROTOCOL + '://elastest:3xp3r1m3nt47@' + env.ET_SUT_HOST + ':' + env.ET_SUT_PORT
-        String tormURL = System.getenv("etEtmUrl");
-        logger.info("Torm Url: " + tormURL);
+        logger.info("Torm Url: " + tormUrl);
 
         driver.manage().window().setSize(new Dimension(1400, 1200));
-        driver.get(tormURL);
+        driver.get(tormUrl);
+
         try
         {
             logger.info("Page title: " + driver.getTitle());
@@ -54,7 +55,7 @@ public class ECEElasTestInElasTestTest extends ElastestBaseTest {
         catch(Exception ex)
         {
             logger.info("Unable to find side navigation link. Directly accessing test engines url");
-            driver.get(tormURL + "/#/test-engines");
+            driver.get(tormUrl + "/#/test-engines");
         }
 
         logger.info("Engines Page title: " + driver.getTitle());
@@ -88,7 +89,7 @@ public class ECEElasTestInElasTestTest extends ElastestBaseTest {
         else
         {
             logger.info("Directly accessing ece page assuming engine actually started");
-            assertEquals(driver.getCurrentUrl(), tormURL + "/#/test-engines");
+            assertEquals(driver.getCurrentUrl(), tormUrl + "/#/test-engines");
             //driver.navigate().to(tormURL + "/#/test-engines/ece");
             //assertEquals(driver.getCurrentUrl(), tormURL + "/#/test-engines/ece");
         }
