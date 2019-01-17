@@ -22,6 +22,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static java.lang.System.getProperty;
 import static java.util.logging.Level.ALL;
 import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.openqa.selenium.remote.CapabilityType.LOGGING_PREFS;
@@ -53,6 +54,11 @@ public class ElastestBaseTest {
 
     @BeforeAll
     public static void setupClass() {
+        String osName = getProperty("os.name").toLowerCase();
+        boolean isMacOs = osName.startsWith("mac os x");
+        if(isMacOs)
+            System.setProperty("webdriver.chrome.driver", getProperty("user.dir") + "/src/test/resources/chromedrivermac");
+
         String sutHost = System.getenv("ET_SUT_HOST");
         String sutPort = System.getenv("ET_SUT_PORT");
         String sutProtocol = System.getenv("ET_SUT_PROTOCOL");
@@ -67,7 +73,7 @@ public class ElastestBaseTest {
         }
         logger.info("Webapp URL: " + sutUrl);
 
-        browserType = System.getProperty("browser");
+        browserType = getProperty("browser");
         logger.info("Browser Type: {}", browserType);
         eusURL = System.getenv("ET_EUS_API");
     }
@@ -91,7 +97,7 @@ public class ElastestBaseTest {
                 caps = DesiredCapabilities.firefox();
             }
 
-            browserVersion = System.getProperty("browserVersion");
+            browserVersion = getProperty("browserVersion");
             if (browserVersion != null) {
                 logger.info("Browser Version: {}", browserVersion);
                 caps.setVersion(browserVersion);
