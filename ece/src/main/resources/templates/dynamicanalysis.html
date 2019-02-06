@@ -141,6 +141,21 @@
                 <div id="collapseTwo_5" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo_5">
                     <span style="font-size: smaller; padding-left:3em">At page load, the remote server time was: <span th:text="${timestring}">time</span>.</span>
                     <div class="panel-body">
+
+                        <div th:if="not ${showcostpanel}" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="card">
+                                <div class="info-box" style="background-color: #e4b9c0">
+                                    <div class="icon">
+                                        <i class="material-icons">warning</i>
+                                    </div>
+                                    <div class="content">
+                                        <div class="text">No data was received from emp for calculation.</div>
+                                        <div class="text">Charts if shown are meaningful only if this dialog does not appear.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
                             <div class="card">
                                 <div class="header">

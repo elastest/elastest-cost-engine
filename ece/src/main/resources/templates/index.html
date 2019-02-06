@@ -60,7 +60,8 @@
                                     <input type="hidden" name="tjobservices" th:value="${tjob.esmServicesString}">
                                     <input type="hidden" name="tjobname" th:value="${tjob.name}">
                                     <input type="hidden" name="tjobid" th:value="${tjob.id}">
-                                    <button type="submit" class="btn btn-primary btn-raised" style="background-color: #ffac2f">True cost</button>
+                                    <button th:if="not ${truecost}" type="submit" class="btn btn-primary btn-raised" style="background-color: #ffac2f">True cost</button>
+                                    <button th:if="${truecost}" type="button" class="btn btn-primary btn-raised" style="background-color: #ffac2f" onclick="javascript:alert('this is disabled due to non availability of emp in this release, or a loss of communication with emp service. please check with the provider.');">True cost</button>
                                 </form>
                             </td>
                         </tr>

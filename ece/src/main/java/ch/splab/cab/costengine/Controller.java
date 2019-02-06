@@ -53,6 +53,13 @@ public class Controller {
     @RequestMapping(value="/", method = RequestMethod.GET)
     public String showIndex(HttpServletRequest request, HttpServletResponse response, Model model)
     {
+        boolean disableRealCost = false;
+        Response test = RESTDriver.doGet(AppConfiguration.getEMPApi(), null);
+        if(test == null)
+        {
+            disableRealCost = true;
+        }
+
         Response restResponse = RESTDriver.doGet(AppConfiguration.getETMApi() + "api/tjob", null);
         if(restResponse.code() == 200)
         {
@@ -73,11 +80,15 @@ public class Controller {
         }
         else
             logger.warn("Unable to call TORM API");
+        logger.info("Sending disableRealCost to: " + disableRealCost);
+        model.addAttribute("truecost", disableRealCost);
         return "index";
     }
 
     @RequestMapping(value="/dynamicanalysis", method = RequestMethod.POST)
     public String getDynamicAnalysisData(HttpServletRequest request, HttpServletResponse response, Model model) {
+        boolean showCostPanel = true;
+
         String tjobId = request.getParameter("tjobid");
         String tjobName = request.getParameter("tjobname");
         model.addAttribute("tjobid", tjobId);
@@ -303,6 +314,11 @@ public class Controller {
                         logger.warn("No data received.");
                     }
                 }
+                else
+                {
+                    logger.warn("No data from EMP received.");
+                    showCostPanel = false;
+                }
                 restResponse.close();
 
                 //if resourceList is empty, add a placeholder 2nd column for GCharts
@@ -316,6 +332,7 @@ public class Controller {
                 model.addAttribute("piedata", piedata);
                 model.addAttribute("totalcost", Math.round(totalCost * 100.0) / 100.0);
                 model.addAttribute("costbreakup", scostList);
+                model.addAttribute("showcostpanel", showCostPanel);
             }
             catch(IOException ioex)
             {
@@ -374,6 +391,11 @@ public class Controller {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("X_Broker_Api_Version", "2.12");
         Response restResponse = RESTDriver.doGet(AppConfiguration.getESMApi() + "v2/catalog", headers);
+
+        if(restResponse == null)
+        {
+            return "error";
+        }
 
         if(restResponse.code() == 200)
         {
