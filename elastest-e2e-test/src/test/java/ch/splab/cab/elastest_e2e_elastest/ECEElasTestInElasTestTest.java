@@ -89,7 +89,7 @@ public class ECEElasTestInElasTestTest extends ElastestBaseTest {
         else
         {
             logger.info("Directly accessing ece page assuming engine actually started");
-            assertEquals(driver.getCurrentUrl(), tormUrl + "/#/test-engines");
+            assertEquals(driver.getCurrentUrl(), tormUrl + "#/test-engines");
             //driver.navigate().to(tormURL + "/#/test-engines/ece");
             //assertEquals(driver.getCurrentUrl(), tormURL + "/#/test-engines/ece");
         }
